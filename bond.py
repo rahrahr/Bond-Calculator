@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+import QuantLib as ql
 
 @dataclass
 class Bond:
@@ -22,7 +22,7 @@ class Bond:
         self.tenor: int = self.get_tenor(code)  # 6M, 3M, etc
         self.accrual_method: str = self.get_accrural_method(code)
 
-        self.bond_ql = self.create_bond_ql()
+        self.bond_ql = self.create_bond_ql() #创建QuantLib Bond类
     
     @staticmethod
     def get_coupon_rate(code: str) -> float:
