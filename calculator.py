@@ -3,7 +3,6 @@ from bond import Bond
 
 
 def bond_yield(bond: Bond) -> float:
-
     ql.Settings.instance().evaluationDate = ql.Date(bond.buy_date, '%Y-%m-%d')
 
     Bond_ql = bond.bond_ql
