@@ -14,10 +14,10 @@ class Ui(QtWidgets.QDialog):
         uic.loadUi("mainwindow.ui", self)
         self.pushButton_basicinfo.clicked.connect(self.getBasicInfo)
         self.pushButton_quote.clicked.connect(self.getQuote)
-        self.pushButton_clear.clicked.connect(self.clearInput)
+        self.pushButton_clear.clicked.connect(self.clearHPY)
         self.pushButton_hpy.clicked.connect(self.getHPY)
         self.pushButton_repo_hpy.clicked.connect(self.getRepoHPY)
-        self.pushButton_clear_yield.clicked.connect(self.clearInput)
+        self.pushButton_clear_yield.clicked.connect(self.clearYield)
         self.pushButton_yield.clicked.connect(self.getYield)
 
     def getBasicInfo(self):
@@ -56,7 +56,7 @@ class Ui(QtWidgets.QDialog):
         self.yield_sh.setText(str(quote_df.loc['yield', 'SH']))
         self.yield_sz.setText(str(quote_df.loc['yield', 'SZ']))
 
-    def clearInput(self):
+    def clearHPY(self):
         for LineEditor in self.HPY.findChildren(QtWidgets.QLineEdit):
             LineEditor.clear()
 
@@ -104,6 +104,13 @@ class Ui(QtWidgets.QDialog):
 
     def getRepoHPY(self):
         pass
+
+    def clearYield(self):
+        for LineEditor in self.Yield_calculation.findChildren(QtWidgets.QLineEdit):
+            LineEditor.clear()
+
+        for QDateEdit in self.Yield_calculation.findChildren(QtWidgets.QDateEdit):
+            QDateEdit.setDate(QtWidgets.QDateEdit().date())
 
     def getYield(self):
         pass

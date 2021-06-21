@@ -29,8 +29,8 @@
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
-     <widget class="Line" name="line">
+    <item row="1" column="2">
+     <widget class="Line" name="line_2">
       <property name="lineWidth">
        <number>5</number>
       </property>
@@ -39,106 +39,14 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QWidget" name="Basic_Info" native="true">
-      <widget class="QLabel" name="code">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>30</y>
-         <width>81</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>债券代码</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="code_text">
-       <property name="geometry">
-        <rect>
-         <x>100</x>
-         <y>30</y>
-         <width>101</width>
-         <height>31</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_basicinfo">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>30</y>
-         <width>112</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>获取信息</string>
-       </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>70</y>
-         <width>261</width>
-         <height>211</height>
-        </rect>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="3" column="1">
-         <widget class="QTextBrowser" name="category"/>
-        </item>
-        <item row="4" column="1">
-         <widget class="QTextBrowser" name="settlement"/>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>结算速度</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>交易平台</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QTextBrowser" name="location"/>
-        </item>
-        <item row="1" column="1">
-         <widget class="QTextBrowser" name="platform"/>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>上市地点</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_11">
-          <property name="text">
-           <string>报价方式</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>债券类别</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QTextBrowser" name="quote_convention"/>
-        </item>
-       </layout>
-      </widget>
+    <item row="2" column="1">
+     <widget class="Line" name="line_4">
+      <property name="lineWidth">
+       <number>5</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
      </widget>
     </item>
     <item row="2" column="2">
@@ -188,32 +96,6 @@
          <height>31</height>
         </rect>
        </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget_2">
-       <property name="geometry">
-        <rect>
-         <x>370</x>
-         <y>180</y>
-         <width>121</width>
-         <height>71</height>
-        </rect>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="1" column="0">
-         <widget class="QPushButton" name="pushButton_yield">
-          <property name="text">
-           <string>开始计算</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="pushButton_clear_yield">
-          <property name="text">
-           <string>Clear</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </widget>
       <widget class="QLabel" name="buy_date_3">
        <property name="geometry">
@@ -328,6 +210,32 @@
          <width>101</width>
          <height>31</height>
         </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_clear_yield">
+       <property name="geometry">
+        <rect>
+         <x>370</x>
+         <y>210</y>
+         <width>121</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Clear</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_yield">
+       <property name="geometry">
+        <rect>
+         <x>370</x>
+         <y>240</y>
+         <width>121</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>开始计算</string>
        </property>
       </widget>
      </widget>
@@ -472,7 +380,7 @@
         <string>买入日期</string>
        </property>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QFrame" name="frame">
        <property name="geometry">
         <rect>
          <x>250</x>
@@ -482,10 +390,10 @@
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
-         <widget class="QPushButton" name="pushButton_clear">
+        <item row="2" column="0">
+         <widget class="QPushButton" name="pushButton_repo_hpy">
           <property name="text">
-           <string>Clear</string>
+           <string>开始计算(买断式回购)</string>
           </property>
          </widget>
         </item>
@@ -496,10 +404,10 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="pushButton_repo_hpy">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="pushButton_clear">
           <property name="text">
-           <string>开始计算(买断式回购)</string>
+           <string>Clear</string>
           </property>
          </widget>
         </item>
@@ -507,13 +415,13 @@
       </widget>
      </widget>
     </item>
-    <item row="1" column="2">
-     <widget class="Line" name="line_2">
+    <item row="0" column="1">
+     <widget class="Line" name="line_3">
       <property name="lineWidth">
        <number>5</number>
       </property>
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Vertical</enum>
       </property>
      </widget>
     </item>
@@ -532,13 +440,13 @@
         <string>获取行情</string>
        </property>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QFrame" name="frame">
        <property name="geometry">
         <rect>
          <x>100</x>
-         <y>70</y>
+         <y>60</y>
          <width>331</width>
-         <height>191</height>
+         <height>211</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
@@ -631,24 +539,123 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="Line" name="line_3">
+    <item row="1" column="0">
+     <widget class="Line" name="line">
       <property name="lineWidth">
        <number>5</number>
       </property>
       <property name="orientation">
-       <enum>Qt::Vertical</enum>
+       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
-     <widget class="Line" name="line_4">
-      <property name="lineWidth">
-       <number>5</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
+    <item row="0" column="0">
+     <widget class="QWidget" name="Basic_Info" native="true">
+      <widget class="QLabel" name="code">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>30</y>
+         <width>81</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>债券代码</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="code_text">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>30</y>
+         <width>101</width>
+         <height>31</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_basicinfo">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>30</y>
+         <width>112</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>获取信息</string>
+       </property>
+      </widget>
+      <widget class="QFrame" name="frame">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>80</y>
+         <width>251</width>
+         <height>201</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="3" column="1">
+         <widget class="QTextBrowser" name="category"/>
+        </item>
+        <item row="4" column="1">
+         <widget class="QTextBrowser" name="settlement"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>结算速度</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>交易平台</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QTextBrowser" name="location"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QTextBrowser" name="platform">
+          <property name="maximumSize">
+           <size>
+            <width>188</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>上市地点</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>报价方式</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>债券类别</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QTextBrowser" name="quote_convention"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -660,10 +667,39 @@
   <tabstop>buy_date_text</tabstop>
   <tabstop>sell_clean_price_text</tabstop>
   <tabstop>sell_date_text</tabstop>
-  <tabstop>pushButton_clear</tabstop>
+  <tabstop>buy_date_text_2</tabstop>
+  <tabstop>option</tabstop>
+  <tabstop>accrued</tabstop>
+  <tabstop>clean</tabstop>
+  <tabstop>full</tabstop>
+  <tabstop>hpy_text</tabstop>
+  <tabstop>yield_if_exercised</tabstop>
   <tabstop>yield_at_buy</tabstop>
   <tabstop>hpy_annualized_text</tabstop>
-  <tabstop>hpy_text</tabstop>
+  <tabstop>pushButton_clear_yield</tabstop>
+  <tabstop>pushButton_yield</tabstop>
+  <tabstop>pushButton_quote</tabstop>
+  <tabstop>pushButton_basicinfo</tabstop>
+  <tabstop>pushButton_repo_hpy</tabstop>
+  <tabstop>pushButton_hpy</tabstop>
+  <tabstop>pushButton_clear</tabstop>
+  <tabstop>code_ib</tabstop>
+  <tabstop>code_sh</tabstop>
+  <tabstop>code_sz</tabstop>
+  <tabstop>clean_price_ib</tabstop>
+  <tabstop>clean_price_sh</tabstop>
+  <tabstop>clean_price_sz</tabstop>
+  <tabstop>full_price_ib</tabstop>
+  <tabstop>full_price_sh</tabstop>
+  <tabstop>full_price_sz</tabstop>
+  <tabstop>yield_ib</tabstop>
+  <tabstop>yield_sh</tabstop>
+  <tabstop>yield_sz</tabstop>
+  <tabstop>category</tabstop>
+  <tabstop>settlement</tabstop>
+  <tabstop>location</tabstop>
+  <tabstop>platform</tabstop>
+  <tabstop>quote_convention</tabstop>
  </tabstops>
  <resources/>
  <connections/>
