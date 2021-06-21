@@ -8,7 +8,6 @@ class Ui(QtWidgets.QDialog):
         super(Ui, self).__init__()
         uic.loadUi("mainwindow.ui", self)
         self.pushButton.clicked.connect(self.printButtonPressed)
-        self.yield_text.setText(str(12))
 
     def printButtonPressed(self):
         # read all the data from input part of UI

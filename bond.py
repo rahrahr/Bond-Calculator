@@ -49,7 +49,7 @@ class Bond:
     def convert_accrural_method(accrural_method: str) -> ql.DayCounter:
         pass
 
-    def create_bond_ql(self):
+    def create_bond_ql(self) -> ql.FixedRateBond:
         issue_date = ql.Date(self.issue_date, '%Y-%m-%d')
         maturity = ql.Date(self.maturity_date, '%Y-%m-%d')
         tenor = ql.Period(self.tenor, ql.Months)
