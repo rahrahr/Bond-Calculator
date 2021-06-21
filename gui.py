@@ -1,15 +1,69 @@
-from PyQt5 import QtWidgets, uic
-import traceback
 import re
-from bond import Bond
+import traceback
+
+from PyQt5 import QtWidgets, uic
+
 import calculator
+from bond import Bond
+from utils import *
+
+
 class Ui(QtWidgets.QDialog):
     def __init__(self):
         super(Ui, self).__init__()
         uic.loadUi("mainwindow.ui", self)
-        self.pushButton.clicked.connect(self.printButtonPressed)
+        self.pushButton_basicinfo.clicked.connect(self.getBasicInfo)
+        self.pushButton_quote.clicked.connect(self.getQuote)
+        self.pushButton_clear.clicked.connect(self.clearInput)
+        self.pushButton_hpy.clicked.connect(self.getHPY)
+        self.pushButton_repo_hpy.clicked.connect(self.getRepoHPY)
+        self.pushButton_clear_yield.clicked.connect(self.clearInput)
+        self.pushButton_yield.clicked.connect(self.getYield)
 
-    def printButtonPressed(self):
+    def getBasicInfo(self):
+        bond_code = self.code_text.text()
+        flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is None
+        if flag1:
+            QtWidgets.QMessageBox.about(self, "错误信息", '债券代码格式错误')
+
+        basic_info = get_basic_info(bond_code)
+        self.location.setText(basic_info['location'])
+        self.platform.setText(basic_info['platform'])
+        self.quote_convention.setText(basic_info['quote_convention'])
+        self.category.setText(basic_info['category'])
+        self.settlement.setText(basic_info['settlement'])
+
+    def getQuote(self):
+        bond_code = self.code_text.text()
+        flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is None
+        if flag1:
+            QtWidgets.QMessageBox.about(self, "错误信息", '债券代码格式错误')
+
+        quote_df = get_quote(bond_code)
+        self.code_ib.setText(str(quote_df.loc['code', 'IB']))
+        self.code_sh.setText(str(quote_df.loc['code', 'SH']))
+        self.code_sz.setText(str(quote_df.loc['code', 'SZ']))
+
+        self.clean_price_ib.setText(str(quote_df.loc['clean', 'IB']))
+        self.clean_price_sh.setText(str(quote_df.loc['clean', 'SH']))
+        self.clean_price_sz.setText(str(quote_df.loc['clean', 'SZ']))
+
+        self.full_price_ib.setText(str(quote_df.loc['full', 'IB']))
+        self.full_price_sh.setText(str(quote_df.loc['full', 'SH']))
+        self.full_price_sz.setText(str(quote_df.loc['full', 'SZ']))
+
+        self.yield_ib.setText(str(quote_df.loc['yield', 'IB']))
+        self.yield_sh.setText(str(quote_df.loc['yield', 'SH']))
+        self.yield_sz.setText(str(quote_df.loc['yield', 'SZ']))
+
+    def clearInput(self):
+        for LineEditor in self.HPY.findChildren(QtWidgets.QLineEdit):
+            LineEditor.clear()
+
+        for QDateEdit in self.HPY.findChildren(QtWidgets.QDateEdit):
+            QDateEdit.setDate(QtWidgets.QDateEdit().date())
+
+    def getHPY(self):
         # read all the data from input part of UI
         bond_code = self.code_text.text()
         buy_clean_price = self.buy_clean_price_text.text()
@@ -42,10 +96,14 @@ class Ui(QtWidgets.QDialog):
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
 
-        yield_at_buy = calculator.bond_yield(bond)
         hpy = calculator.hpy(bond)
-        hpy_annualized = None # TODO
+        hpy_annualized = None  # TODO
 
-        self.yield_text.setText(str(yield_at_buy))
         self.hpy_text.setText(str(hpy))
         self.hpy_annualized_text.setText(str(hpy_annualized))
+
+    def getRepoHPY(self):
+        pass
+
+    def getYield(self):
+        pass
