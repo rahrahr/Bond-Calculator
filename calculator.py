@@ -32,3 +32,14 @@ def hpy(bond: Bond) -> float:
     coupon_received = sum(coupon_between)
 
     return (sell_dirty + coupon_received) / buy_dirty
+
+
+def hpy_annualized(bond: Bond) -> float:
+    hpy = hpy(bond)
+    f = bond.bond_ql.dayCounter().yearFraction
+    buy_date = ql.Date(bond.buy_date, '%Y-%m-%d')
+    sell_date = ql.Date(bond.sell_date, '%Y-%m-%d')
+
+    year_faction = f(buy_date, sell_date)
+    hpy_annualized = (1 + hpy) ** (1/year_faction) - 1
+    return hpy_annualized

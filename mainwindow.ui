@@ -39,16 +39,6 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
-     <widget class="Line" name="line_4">
-      <property name="lineWidth">
-       <number>5</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="2">
      <widget class="QWidget" name="Yield_calculation" native="true">
       <widget class="QLabel" name="label_6">
@@ -133,16 +123,6 @@
         <string>应计利息</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="accrued">
-       <property name="geometry">
-        <rect>
-         <x>350</x>
-         <y>80</y>
-         <width>101</width>
-         <height>31</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_17">
        <property name="geometry">
         <rect>
@@ -202,16 +182,6 @@
         <string>全价</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="full">
-       <property name="geometry">
-        <rect>
-         <x>130</x>
-         <y>160</y>
-         <width>101</width>
-         <height>31</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QPushButton" name="pushButton_clear_yield">
        <property name="geometry">
         <rect>
@@ -237,6 +207,150 @@
        <property name="text">
         <string>开始计算</string>
        </property>
+      </widget>
+      <widget class="QTextBrowser" name="accrued">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>80</y>
+         <width>101</width>
+         <height>31</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QTextBrowser" name="full">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>160</y>
+         <width>101</width>
+         <height>31</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="Line" name="line_4">
+      <property name="lineWidth">
+       <number>5</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QWidget" name="Quote" native="true">
+      <widget class="QPushButton" name="pushButton_quote">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>30</y>
+         <width>112</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>获取行情</string>
+       </property>
+      </widget>
+      <widget class="QFrame" name="frame">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>60</y>
+         <width>331</width>
+         <height>211</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="1">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>银行间</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>上交所</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>深交所</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>代码</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QTextBrowser" name="code_ib"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="QTextBrowser" name="code_sh"/>
+        </item>
+        <item row="1" column="3">
+         <widget class="QTextBrowser" name="code_sz"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>净价</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QTextBrowser" name="clean_price_ib"/>
+        </item>
+        <item row="2" column="2">
+         <widget class="QTextBrowser" name="clean_price_sh"/>
+        </item>
+        <item row="2" column="3">
+         <widget class="QTextBrowser" name="clean_price_sz"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_15">
+          <property name="text">
+           <string>全价</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QTextBrowser" name="full_price_ib"/>
+        </item>
+        <item row="3" column="2">
+         <widget class="QTextBrowser" name="full_price_sh"/>
+        </item>
+        <item row="3" column="3">
+         <widget class="QTextBrowser" name="full_price_sz"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>收益率</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QTextBrowser" name="yield_ib"/>
+        </item>
+        <item row="4" column="2">
+         <widget class="QTextBrowser" name="yield_sh"/>
+        </item>
+        <item row="4" column="3">
+         <widget class="QTextBrowser" name="yield_sz"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -415,130 +529,6 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="Line" name="line_3">
-      <property name="lineWidth">
-       <number>5</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QWidget" name="Quote" native="true">
-      <widget class="QPushButton" name="pushButton_quote">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>30</y>
-         <width>112</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>获取行情</string>
-       </property>
-      </widget>
-      <widget class="QFrame" name="frame">
-       <property name="geometry">
-        <rect>
-         <x>100</x>
-         <y>60</y>
-         <width>331</width>
-         <height>211</height>
-        </rect>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="1">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>银行间</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>上交所</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>深交所</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>代码</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QTextBrowser" name="code_ib"/>
-        </item>
-        <item row="1" column="2">
-         <widget class="QTextBrowser" name="code_sh"/>
-        </item>
-        <item row="1" column="3">
-         <widget class="QTextBrowser" name="code_sz"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>净价</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QTextBrowser" name="clean_price_ib"/>
-        </item>
-        <item row="2" column="2">
-         <widget class="QTextBrowser" name="clean_price_sh"/>
-        </item>
-        <item row="2" column="3">
-         <widget class="QTextBrowser" name="clean_price_sz"/>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_15">
-          <property name="text">
-           <string>全价</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QTextBrowser" name="full_price_ib"/>
-        </item>
-        <item row="3" column="2">
-         <widget class="QTextBrowser" name="full_price_sh"/>
-        </item>
-        <item row="3" column="3">
-         <widget class="QTextBrowser" name="full_price_sz"/>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_16">
-          <property name="text">
-           <string>收益率</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QTextBrowser" name="yield_ib"/>
-        </item>
-        <item row="4" column="2">
-         <widget class="QTextBrowser" name="yield_sh"/>
-        </item>
-        <item row="4" column="3">
-         <widget class="QTextBrowser" name="yield_sz"/>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="Line" name="line">
       <property name="lineWidth">
@@ -546,6 +536,16 @@
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="Line" name="line_3">
+      <property name="lineWidth">
+       <number>5</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
      </widget>
     </item>
@@ -656,6 +656,39 @@
         </item>
        </layout>
       </widget>
+      <widget class="QLabel" name="label_4">
+       <property name="geometry">
+        <rect>
+         <x>340</x>
+         <y>110</y>
+         <width>131</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>银行间市场结算速度</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox">
+       <property name="geometry">
+        <rect>
+         <x>360</x>
+         <y>140</y>
+         <width>91</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>T+0</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>T+1</string>
+        </property>
+       </item>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -669,9 +702,7 @@
   <tabstop>sell_date_text</tabstop>
   <tabstop>buy_date_text_2</tabstop>
   <tabstop>option</tabstop>
-  <tabstop>accrued</tabstop>
   <tabstop>clean</tabstop>
-  <tabstop>full</tabstop>
   <tabstop>hpy_text</tabstop>
   <tabstop>yield_if_exercised</tabstop>
   <tabstop>yield_at_buy</tabstop>

@@ -42,3 +42,6 @@ def get_accrural_method(code: str) -> float:
 
 def convert_accrural_method(accrural_method: str) -> ql.DayCounter:
     pass
+
+def get_settlement(code: str) -> int:
+    pass

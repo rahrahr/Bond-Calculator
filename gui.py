@@ -97,7 +97,7 @@ class Ui(QtWidgets.QDialog):
             return
 
         hpy = calculator.hpy(bond)
-        hpy_annualized = None  # TODO
+        hpy_annualized = calculator.hpy_annualized(bond)  # TODO
 
         self.hpy_text.setText(str(hpy))
         self.hpy_annualized_text.setText(str(hpy_annualized))
@@ -113,4 +113,37 @@ class Ui(QtWidgets.QDialog):
             QDateEdit.setDate(QtWidgets.QDateEdit().date())
 
     def getYield(self):
-        pass
+        # read all the data from input part of UI
+        bond_code = self.code_text.text()
+        buy_clean_price = self.clean.text()
+        buy_date = self.buy_date_text_2.text().replace('/', '-')
+        sell_clean_price = 100 # Not actually used
+        sell_date = '2000-01-01'  # Not actually used
+
+        # do sanity check
+        flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
+        flag2 = buy_clean_price.replace('.', '', 1).isdigit()
+        flags = (flag1, flag2)
+
+        if not all(flags):
+            error_messages = ('债券代码格式错误\n',
+                              '买入净价不为浮点数\n')
+            error_string = ''.join(
+                (error_messages[i] for i in range(2) if not flags[i]))
+            QtWidgets.QMessageBox.about(self, "错误信息", error_string)
+            return
+
+        try:
+            bond = Bond(bond_code,
+                        buy_date,
+                        sell_date,
+                        buy_clean_price,
+                        sell_clean_price)
+        except Exception:
+            QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
+            return
+
+        buy_yield = calculator.bond_yield(bond)
+        self.yield_at_buy.setText(str(hpy))
+        self.accrued.setText(str(bond.bond_ql.accruedAmount()))
+        self.full.setText(str(bond.bond_ql.accruedAmount() + buy_clean_price))
