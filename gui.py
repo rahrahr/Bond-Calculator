@@ -8,7 +8,7 @@ from bond import Bond
 from utils import *
 
 
-class Ui(QtWidgets.QDialog):
+class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
         uic.loadUi("mainwindow.ui", self)
@@ -97,13 +97,53 @@ class Ui(QtWidgets.QDialog):
             return
 
         hpy = calculator.hpy(bond)
-        hpy_annualized = calculator.hpy_annualized(bond)  # TODO
+        hpy_annualized = calculator.hpy(bond, annualized=True)  # TODO
+        coupon_received = calculator.get_coupon_received(bond)
 
         self.hpy_text.setText(str(hpy))
         self.hpy_annualized_text.setText(str(hpy_annualized))
+        self.coupon_received.setText(str(coupon_received))
 
     def getRepoHPY(self):
-        pass
+        # read all the data from input part of UI
+        bond_code = self.code_text.text()
+        buy_clean_price = self.buy_clean_price_text.text()
+        buy_date = self.buy_date_text.text().replace('/', '-')
+        sell_clean_price = self.sell_clean_price_text.text()
+        sell_date = self.sell_date_text.text().replace('/', '-')
+
+        # do sanity check
+        flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
+        flag2 = buy_clean_price.replace('.', '', 1).isdigit()
+        flag3 = sell_clean_price.replace('.', '', 1).isdigit()
+        flags = (flag1, flag2, flag3)
+
+        if not all(flags):
+            error_messages = ('债券代码格式错误\n',
+                              '买入净价不为浮点数\n',
+                              '卖出净价不为浮点数')
+            error_string = ''.join(
+                (error_messages[i] for i in range(3) if not flags[i]))
+            QtWidgets.QMessageBox.about(self, "错误信息", error_string)
+            return
+
+        try:
+            bond = Bond(bond_code,
+                        buy_date,
+                        sell_date,
+                        buy_clean_price,
+                        sell_clean_price)
+        except Exception:
+            QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
+            return
+
+        repo_hpy = calculator.repo_hpy(bond)
+        repo_hpy_annualized = calculator.repo_hpy(bond, annualized=True)  # TODO
+        coupon_received = calculator.get_coupon_received(bond)
+        
+        self.hpy_text.setText(str(repo_hpy))
+        self.hpy_annualized_text.setText(str(repo_hpy_annualized))
+        self.coupon_received.setText(str(coupon_received))
 
     def clearYield(self):
         for LineEditor in self.Yield_calculation.findChildren(QtWidgets.QLineEdit):
@@ -117,7 +157,7 @@ class Ui(QtWidgets.QDialog):
         bond_code = self.code_text.text()
         buy_clean_price = self.clean.text()
         buy_date = self.buy_date_text_2.text().replace('/', '-')
-        sell_clean_price = 100 # Not actually used
+        sell_clean_price = 100  # Not actually used
         sell_date = '2000-01-01'  # Not actually used
 
         # do sanity check
