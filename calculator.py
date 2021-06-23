@@ -18,8 +18,8 @@ def hpy(bond: Bond, annualized: bool = False) -> float:
     # (sell_dirty + coupon_received) / buy_dirty
 
     Bond_ql = bond.bond_ql
-    buy_date = ql.Date(bond.buy_date, '%Y-%M-%D')
-    sell_date = ql.Date(bond.sell_date, '%Y-%M-%D')
+    buy_date = ql.Date(bond.buy_date, '%Y-%m-%d')
+    sell_date = ql.Date(bond.sell_date, '%Y-%m-%d')
 
     ql.Settings.instance().evaluationDate = buy_date
     buy_dirty = bond.buy_clean_price + Bond_ql.accruedAmount()
@@ -37,9 +37,6 @@ def hpy(bond: Bond, annualized: bool = False) -> float:
     
     # Annualize hpy
     f = bond.bond_ql.dayCounter().yearFraction
-    buy_date = ql.Date(bond.buy_date, '%Y-%M-%D')
-    sell_date = ql.Date(bond.sell_date, '%Y-%M-%D')
-
     year_faction = f(buy_date, sell_date)
     hpy_annualized = (1 + hpy) ** (1/year_faction) - 1
     return hpy_annualized
@@ -49,8 +46,8 @@ def hpy_repo(bond: Bond, annualized: bool = False) -> float:
     # (sell_dirty + coupon_received) / buy_dirty
 
     Bond_ql = bond.bond_ql
-    buy_date = ql.Date(bond.buy_date, '%Y-%M-%D')
-    sell_date = ql.Date(bond.sell_date, '%Y-%M-%D')
+    buy_date = ql.Date(bond.buy_date, '%Y-%m-%d')
+    sell_date = ql.Date(bond.sell_date, '%Y-%m-%d')
 
     ql.Settings.instance().evaluationDate = buy_date
     buy_dirty = bond.buy_clean_price + Bond_ql.accruedAmount()
@@ -67,17 +64,14 @@ def hpy_repo(bond: Bond, annualized: bool = False) -> float:
         return repo_hpy
 
     f = bond.bond_ql.dayCounter().yearFraction
-    buy_date = ql.Date(bond.buy_date, '%Y-%M-%D')
-    sell_date = ql.Date(bond.sell_date, '%Y-%M-%D')
-
     year_faction = f(buy_date, sell_date)
     hpy_annualized = (1 + repo_hpy) ** (1/year_faction) - 1
     return repo_hpy_annualized
 
 def get_coupon_received(bond: Bond):
     Bond_ql = bond.bond_ql
-    buy_date = ql.Date(bond.buy_date, '%Y-%M-%D')
-    sell_date = ql.Date(bond.sell_date, '%Y-%M-%D')
+    buy_date = ql.Date(bond.buy_date, '%Y-%m-%d')
+    sell_date = ql.Date(bond.sell_date, '%Y-%m-%d')
 
     coupon_between = [c.amount() for c in Bond_ql.cashflows()
                       if buy_date < c.date() <= sell_date]
