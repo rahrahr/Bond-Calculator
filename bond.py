@@ -25,7 +25,7 @@ class Bond:
         self.coupon_rate: float = get_coupon_rate(code)
         self.tenor: int = get_tenor(code)  # 6M, 3M, etc
         self.accrual_method: str = get_accrural_method(code)
-        self.settlement: str = get_settlement(code) # 0 or 1 (correspond to T+0 or T+1)
+        self.settlement: int = get_settlement(code) # 0 or 1 (correspond to T+0 or T+1)
 
         self.bond_ql = self.create_bond_ql()  # 创建QuantLib Bond类
 
@@ -42,7 +42,7 @@ class Bond:
                                    issue_date,
                                    maturity,
                                    tenor,
-                                   [bond.coupon],
+                                   [self.coupon_rate],
                                    daycount_convention)
 
         return Bond_ql

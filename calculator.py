@@ -9,7 +9,7 @@ def bond_yield(bond: Bond) -> float:
     Bond_ql = bond.bond_ql
 
     return Bond_ql.bondYield(bond.buy_clean_price,
-                             Bond_ql.DayCounter(),
+                             Bond_ql.dayCounter(),
                              ql.Compounded,
                              Bond_ql.frequency())
 
@@ -31,7 +31,7 @@ def hpy(bond: Bond, annualized: bool = False) -> float:
                       if buy_date < c.date() <= sell_date]
     coupon_received = sum(coupon_between)
 
-    hpy = (sell_dirty + coupon_received) / buy_dirty
+    hpy = (sell_dirty + coupon_received) / buy_dirty - 1
     if not annualized:
         return hpy
     
