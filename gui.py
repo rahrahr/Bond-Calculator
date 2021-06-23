@@ -73,7 +73,8 @@ class Ui(QtWidgets.QMainWindow):
         buy_date = self.buy_date_text.text().replace('/', '-')
         sell_clean_price = self.sell_clean_price_text.text()
         sell_date = self.sell_date_text.text().replace('/', '-')
-
+        print(buy_date, sell_date)
+        
         # do sanity check
         flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
         flag2 = buy_clean_price.replace('.', '', 1).isdigit()
@@ -93,8 +94,8 @@ class Ui(QtWidgets.QMainWindow):
             bond = Bond(bond_code,
                         buy_date,
                         sell_date,
-                        buy_clean_price,
-                        sell_clean_price)
+                        float(buy_clean_price),
+                        float(sell_clean_price))
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
@@ -134,8 +135,8 @@ class Ui(QtWidgets.QMainWindow):
             bond = Bond(bond_code,
                         buy_date,
                         sell_date,
-                        buy_clean_price,
-                        sell_clean_price)
+                        float(buy_clean_price),
+                        float(sell_clean_price))
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
@@ -181,8 +182,8 @@ class Ui(QtWidgets.QMainWindow):
             bond = Bond(bond_code,
                         buy_date,
                         sell_date,
-                        buy_clean_price,
-                        sell_clean_price)
+                        float(buy_clean_price),
+                        float(sell_clean_price))
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
