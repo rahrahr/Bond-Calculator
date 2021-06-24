@@ -22,7 +22,7 @@ class Bond:
         # The following fields require WindPy to acquire.
         self.issue_date: str = get_issue_date(code)  # YYYY-MM-DD
         self.maturity_date: str = get_maturity_date(code)  # YYYY-MM-DD
-        self.coupon_rate: float = get_coupon_rate(code)
+        self.coupon_rate: float = get_coupon_rate(code) / 100
         self.tenor: int = get_tenor(code)  # 6M, 3M, etc
         self.accrual_method: str = get_accrural_method(code)
         self.settlement: int = get_settlement(code) # 0 or 1 (correspond to T+0 or T+1)
@@ -30,7 +30,7 @@ class Bond:
         self.bond_ql = self.create_bond_ql()  # 创建QuantLib Bond类
 
     def create_bond_ql(self) -> ql.FixedRateBond:
-        issue_date = ql.Date(self.issue_date, '%Y-%m-%d')
+        issue_date = ql.Date(self.issue_date, '%Y-%M-%D')
         maturity = ql.Date(self.maturity_date, '%Y-%m-%d')
         tenor = ql.Period(self.tenor, ql.Months)
         daycount_convention = self.convert_accrural_method(

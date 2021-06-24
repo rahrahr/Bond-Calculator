@@ -33,6 +33,12 @@ class Ui(QtWidgets.QMainWindow):
         self.category.setText(basic_info['category'])
         self.settlement.setText(basic_info['settlement'])
 
+        # The following fills out the bottom-right part of the GUI related to option.
+        option = get_embedded_option(code)
+        if option[0]:
+            self.has_option.setChecked(True)
+            self.strike_price.setText('{:.4f'.format(option[1]))
+            
     def getQuote(self):
         bond_code = self.code_text.text()
         flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is None
@@ -73,8 +79,8 @@ class Ui(QtWidgets.QMainWindow):
         buy_date = self.buy_date_text.text().replace('/', '-')
         sell_clean_price = self.sell_clean_price_text.text()
         sell_date = self.sell_date_text.text().replace('/', '-')
-        print(buy_date, sell_date)
-        
+        ib_settlement = int(self.ibsettlement.text())
+
         # do sanity check
         flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
         flag2 = buy_clean_price.replace('.', '', 1).isdigit()
@@ -96,6 +102,11 @@ class Ui(QtWidgets.QMainWindow):
                         sell_date,
                         float(buy_clean_price),
                         float(sell_clean_price))
+
+            if bond_code[-2:] =='IB' and ib_settlement != 0:
+                bond.settlement = ib_settlement
+                bond.bond_ql = bond.create_bond_ql()
+
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
@@ -104,9 +115,9 @@ class Ui(QtWidgets.QMainWindow):
         hpy_annualized = calculator.hpy(bond, annualized=True)  # TODO
         coupon_received = calculator.get_coupon_received(bond)
 
-        self.hpy_text.setText(str(hpy))
-        self.hpy_annualized_text.setText(str(hpy_annualized))
-        self.coupon_received.setText(str(coupon_received))
+        self.hpy_text.setText('{:.4f}'.format(hpy))
+        self.hpy_annualized_text.setText('{:.4f}'.format(hpy_annualized))
+        self.coupon_received.setText('{:.4f}'.format(coupon_received))
 
     def getRepoHPY(self):
         # read all the data from input part of UI
@@ -115,6 +126,7 @@ class Ui(QtWidgets.QMainWindow):
         buy_date = self.buy_date_text.text().replace('/', '-')
         sell_clean_price = self.sell_clean_price_text.text()
         sell_date = self.sell_date_text.text().replace('/', '-')
+        ib_settlement = int(self.ibsettlement.text())
 
         # do sanity check
         flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
@@ -137,6 +149,10 @@ class Ui(QtWidgets.QMainWindow):
                         sell_date,
                         float(buy_clean_price),
                         float(sell_clean_price))
+            if bond_code[-2:] == 'IB' and ib_settlement != 0:
+                bond.settlement = ib_settlement
+                bond.bond_ql = bond.create_bond_ql()
+
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
@@ -146,9 +162,9 @@ class Ui(QtWidgets.QMainWindow):
             bond, annualized=True)  # TODO
         coupon_received = calculator.get_coupon_received(bond)
 
-        self.hpy_text.setText(str(repo_hpy))
-        self.hpy_annualized_text.setText(str(repo_hpy_annualized))
-        self.coupon_received.setText(str(coupon_received))
+        self.hpy_text.setText('{:.4f}'.format(repo_hpy))
+        self.hpy_annualized_text.setText('{:.4f}'.format(repo_hpy_annualized))
+        self.coupon_received.setText('{:.4f}'.format(coupon_received))
 
     def clearYield(self):
         for LineEditor in self.Yield_calculation.findChildren(QtWidgets.QLineEdit):
@@ -157,6 +173,9 @@ class Ui(QtWidgets.QMainWindow):
         for QDateEdit in self.Yield_calculation.findChildren(QtWidgets.QDateEdit):
             QDateEdit.setDate(QtWidgets.QDateEdit().date())
 
+        for QCheckBox in self.Yield_calculation.findChildren(QtWidgets.QCheckBox):
+            QCheckBox.setChecked(False)
+
     def getYield(self):
         # read all the data from input part of UI
         bond_code = self.code_text.text()
@@ -164,6 +183,7 @@ class Ui(QtWidgets.QMainWindow):
         buy_date = self.buy_date_text_2.text().replace('/', '-')
         sell_clean_price = 100  # Not actually used
         sell_date = '2000-01-01'  # Not actually used
+        ib_settlement = int(self.ibsettlement.text())
 
         # do sanity check
         flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
@@ -184,11 +204,16 @@ class Ui(QtWidgets.QMainWindow):
                         sell_date,
                         float(buy_clean_price),
                         float(sell_clean_price))
+            if bond_code[-2:] == 'IB' and ib_settlement != 0:
+                bond.settlement = ib_settlement
+                bond.bond_ql = bond.create_bond_ql()
+
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
 
         buy_yield = calculator.bond_yield(bond)
-        self.yield_at_buy.setText(str(hpy))
-        self.accrued.setText(str(bond.bond_ql.accruedAmount()))
-        self.full.setText(str(bond.bond_ql.accruedAmount() + buy_clean_price))
+        self.yield_at_buy.setText('{:.4f}'.format(buy_yield))
+        self.accrued.setText('{:.4f}'.format(bond.bond_ql.accruedAmount()))
+        self.full.setText('{:.4f}'.format(
+            bond.bond_ql.accruedAmount() + buy_clean_price))

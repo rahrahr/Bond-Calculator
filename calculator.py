@@ -59,7 +59,7 @@ def hpy_repo(bond: Bond, annualized: bool = False) -> float:
                       if buy_date < c.date() <= sell_date]
     coupon_received = sum(coupon_between)
 
-    repo_hpy = (sell_dirty - buy_dirty + coupon_received) / buy_dirty
+    repo_hpy = (buy_dirty - sell_dirty) / buy_dirty
     if not annualized:
         return repo_hpy
 
