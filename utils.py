@@ -7,6 +7,7 @@ import datetime
 w.start()
 today = datetime.date.today().strftime('%Y-%m-%d')
 
+
 def get_basic_info(code: str) -> dict:
     # 获取左上部分信息
 
@@ -82,6 +83,12 @@ def get_settlement(code: str) -> int:
         return 1
     else:
         return 0
+
+
+def get_tax_info(code: str) -> list:
+    tax_info = w.wsd(code, "taxfree, taxrate", "ED0D", today, "").Data
+    return [tax_info[0][0], tax_info[1][0]]
+
 
 def get_embedded_option(code: str) -> (bool, float):
     return (False, 100)

@@ -79,7 +79,7 @@ class Ui(QtWidgets.QMainWindow):
         buy_date = self.buy_date_text.text().replace('/', '-')
         sell_clean_price = self.sell_clean_price_text.text()
         sell_date = self.sell_date_text.text().replace('/', '-')
-        ib_settlement = int(self.ibsettlement.text())
+        ib_settlement = int(self.ib_settlement.text())
 
         # do sanity check
         flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
@@ -126,7 +126,7 @@ class Ui(QtWidgets.QMainWindow):
         buy_date = self.buy_date_text.text().replace('/', '-')
         sell_clean_price = self.sell_clean_price_text.text()
         sell_date = self.sell_date_text.text().replace('/', '-')
-        ib_settlement = int(self.ibsettlement.text())
+        ib_settlement = int(self.ib_settlement.text())
 
         # do sanity check
         flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
@@ -183,7 +183,7 @@ class Ui(QtWidgets.QMainWindow):
         buy_date = self.buy_date_text_2.text().replace('/', '-')
         sell_clean_price = 100  # Not actually used
         sell_date = '2000-01-01'  # Not actually used
-        ib_settlement = int(self.ibsettlement.text())
+        ib_settlement = int(self.ib_settlement.text())
 
         # do sanity check
         flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None

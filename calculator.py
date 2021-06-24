@@ -15,8 +15,7 @@ def bond_yield(bond: Bond) -> float:
 
 
 def hpy(bond: Bond, annualized: bool = False) -> float:
-    # (sell_dirty + coupon_received) / buy_dirty
-
+    # (sell_dirty + coupon_received) / buy_dirty - 1
     Bond_ql = bond.bond_ql
     buy_date = ql.Date(bond.buy_date, '%Y-%m-%d')
     sell_date = ql.Date(bond.sell_date, '%Y-%m-%d')
@@ -34,7 +33,7 @@ def hpy(bond: Bond, annualized: bool = False) -> float:
     hpy = (sell_dirty + coupon_received) / buy_dirty - 1
     if not annualized:
         return hpy
-    
+
     # Annualize hpy
     f = bond.bond_ql.dayCounter().yearFraction
     year_faction = f(buy_date, sell_date)
@@ -59,14 +58,18 @@ def hpy_repo(bond: Bond, annualized: bool = False) -> float:
                       if buy_date < c.date() <= sell_date]
     coupon_received = sum(coupon_between)
 
-    repo_hpy = (buy_dirty - sell_dirty) / buy_dirty
+    if bond.taxFree == '否':
+       coupon_received = coupon_received * (1 - bond.taxRate/100.0)
+
+    repo_hpy = (sell_dirty - buy_dirty + coupon_received) / buy_dirty
     if not annualized:
         return repo_hpy
 
     f = bond.bond_ql.dayCounter().yearFraction
     year_faction = f(buy_date, sell_date)
-    hpy_annualized = (1 + repo_hpy) ** (1/year_faction) - 1
+    repo_hpy_annualized = (1 + repo_hpy) ** (1/year_faction) - 1
     return repo_hpy_annualized
+
 
 def get_coupon_received(bond: Bond):
     Bond_ql = bond.bond_ql
@@ -76,4 +79,6 @@ def get_coupon_received(bond: Bond):
     coupon_between = [c.amount() for c in Bond_ql.cashflows()
                       if buy_date < c.date() <= sell_date]
     coupon_received = sum(coupon_between)
+    if bond.taxFree == '否':
+       coupon_received = coupon_received * (1 - bond.taxRate/100.0)
     return coupon_received
