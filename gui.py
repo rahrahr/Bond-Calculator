@@ -5,7 +5,11 @@ from PyQt5 import QtWidgets, uic
 
 import calculator
 from bond import Bond, SCP
-from utils_test import *
+
+if sys.platform == 'darwin':
+    from utils_test import *
+else:
+    from utils import *
 
 
 class Ui(QtWidgets.QMainWindow):
