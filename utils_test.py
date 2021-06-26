@@ -63,9 +63,23 @@ def get_embedded_option(code: str) -> (bool, float):
 
     if embeddedopt.loc['是否含权债'] == '否':
         return (False, 100.0)
-    elif 'C' in embeddedopt.loc['特殊条款']:
+    elif '赎回' in embeddedopt.loc['特殊条款']:
         return (True, embeddedopt.loc['赎回价格'])
-    elif 'P' in embeddedopt.loc['特殊条款']:
+    elif '回售' in embeddedopt.loc['特殊条款']:
         return (True, embeddedopt.loc['回售价格'])
     else:
         return (True, 100.0)
+
+
+def get_embedded_option_maturity(code: str) -> str:
+    if not get_embedded_option(code)[0]:
+        return
+    else:
+        repo_date = data_1.loc[code, '回售日']
+        redeem_date = data_1.loc[code, '赎回日']
+        if not pd.isnull(repo_date):
+            return repo_date
+        elif not pd.isnull(redeem_date):
+            return redeem_date
+        else:
+            raise Exception('不属于回售/赎回')
