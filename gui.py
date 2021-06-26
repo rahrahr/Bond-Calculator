@@ -4,8 +4,8 @@ import traceback
 from PyQt5 import QtWidgets, uic
 
 import calculator
-from bond import Bond
-from utils import *
+from bond import Bond, SCP
+from utils_test import *
 
 
 class Ui(QtWidgets.QMainWindow):
@@ -19,12 +19,14 @@ class Ui(QtWidgets.QMainWindow):
         self.pushButton_repo_hpy.clicked.connect(self.getRepoHPY)
         self.pushButton_clear_yield.clicked.connect(self.clearYield)
         self.pushButton_yield.clicked.connect(self.getYield)
+        self.ib_settlement.valueChanged.connect(self.change_settlement)
 
     def getBasicInfo(self):
         bond_code = self.code_text.text()
-        flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is None
+        flag1 = re.match(r'^\d{6,}\.(IB|SZ|SH)$', bond_code) is None
         if flag1:
             QtWidgets.QMessageBox.about(self, "错误信息", '债券代码格式错误')
+            return
 
         basic_info = get_basic_info(bond_code)
         self.location.setText(basic_info['location'])
@@ -34,14 +36,23 @@ class Ui(QtWidgets.QMainWindow):
         self.settlement.setText(basic_info['settlement'])
 
         # The following fills out the bottom-right part of the GUI related to option.
-        option = get_embedded_option(code)
+        option = get_embedded_option(bond_code)
         if option[0]:
             self.has_option.setChecked(True)
-            self.strike_price.setText('{:.4f'.format(option[1]))
-            
+            self.strike_price.setText('{:.4f}'.format(option[1]))
+
+    def change_settlement(self):
+        bond_code = self.code_text.text()
+        flag1 = re.match(r'^\d{6,}\.(IB|SZ|SH)$', bond_code) is None
+        if flag1:
+            return
+        if bond_code[-2:] == 'IB':
+            self.settlement.setText(
+                'T+{}'.format(int(self.ib_settlement.text())))
+
     def getQuote(self):
         bond_code = self.code_text.text()
-        flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is None
+        flag1 = re.match(r'^\d{6,}\.(IB|SZ|SH)$', bond_code) is None
         if flag1:
             QtWidgets.QMessageBox.about(self, "错误信息", '债券代码格式错误')
 
@@ -82,7 +93,7 @@ class Ui(QtWidgets.QMainWindow):
         ib_settlement = int(self.ib_settlement.text())
 
         # do sanity check
-        flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
+        flag1 = re.match(r'^\d{6,}\.(IB|SZ|SH)$', bond_code) is not None
         flag2 = buy_clean_price.replace('.', '', 1).isdigit()
         flag3 = sell_clean_price.replace('.', '', 1).isdigit()
         flags = (flag1, flag2, flag3)
@@ -97,15 +108,8 @@ class Ui(QtWidgets.QMainWindow):
             return
 
         try:
-            bond = Bond(bond_code,
-                        buy_date,
-                        sell_date,
-                        float(buy_clean_price),
-                        float(sell_clean_price))
-
-            if bond_code[-2:] =='IB' and ib_settlement != 0:
-                bond.settlement = ib_settlement
-                bond.bond_ql = bond.create_bond_ql()
+            bond = create_bond_(bond_code, buy_date, sell_date,
+                                buy_clean_price, sell_clean_price, ib_settlement)
 
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
@@ -115,8 +119,8 @@ class Ui(QtWidgets.QMainWindow):
         hpy_annualized = calculator.hpy(bond, annualized=True)  # TODO
         coupon_received = calculator.get_coupon_received(bond)
 
-        self.hpy_text.setText('{:.4f}'.format(hpy))
-        self.hpy_annualized_text.setText('{:.4f}'.format(hpy_annualized))
+        self.hpy_text.setText('{:.4f}'.format(hpy * 100))
+        self.hpy_annualized_text.setText('{:.4f}'.format(hpy_annualized * 100))
         self.coupon_received.setText('{:.4f}'.format(coupon_received))
 
     def getRepoHPY(self):
@@ -126,10 +130,10 @@ class Ui(QtWidgets.QMainWindow):
         buy_date = self.buy_date_text.text().replace('/', '-')
         sell_clean_price = self.sell_clean_price_text.text()
         sell_date = self.sell_date_text.text().replace('/', '-')
-        ib_settlement = int(self.ib_settlement.text())
+        ib_settlement = int(self.ibsettlement.text())
 
         # do sanity check
-        flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
+        flag1 = re.match(r'^\d{6,}\.(IB|SZ|SH)$', bond_code) is not None
         flag2 = buy_clean_price.replace('.', '', 1).isdigit()
         flag3 = sell_clean_price.replace('.', '', 1).isdigit()
         flags = (flag1, flag2, flag3)
@@ -144,14 +148,8 @@ class Ui(QtWidgets.QMainWindow):
             return
 
         try:
-            bond = Bond(bond_code,
-                        buy_date,
-                        sell_date,
-                        float(buy_clean_price),
-                        float(sell_clean_price))
-            if bond_code[-2:] == 'IB' and ib_settlement != 0:
-                bond.settlement = ib_settlement
-                bond.bond_ql = bond.create_bond_ql()
+            bond = create_bond_(bond_code, buy_date, sell_date,
+                                buy_clean_price, sell_clean_price, ib_settlement)
 
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
@@ -162,8 +160,9 @@ class Ui(QtWidgets.QMainWindow):
             bond, annualized=True)  # TODO
         coupon_received = calculator.get_coupon_received(bond)
 
-        self.hpy_text.setText('{:.4f}'.format(repo_hpy))
-        self.hpy_annualized_text.setText('{:.4f}'.format(repo_hpy_annualized))
+        self.hpy_text.setText('{:.4f}'.format(repo_hpy * 100))
+        self.hpy_annualized_text.setText(
+            '{:.4f}'.format(repo_hpy_annualized * 100))
         self.coupon_received.setText('{:.4f}'.format(coupon_received))
 
     def clearYield(self):
@@ -186,7 +185,8 @@ class Ui(QtWidgets.QMainWindow):
         ib_settlement = int(self.ib_settlement.text())
 
         # do sanity check
-        flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
+       # flag1 = re.match(r'^\d{6}\.(IB|SZ|SH)$', bond_code) is not None
+        flag1 = True
         flag2 = buy_clean_price.replace('.', '', 1).isdigit()
         flags = (flag1, flag2)
 
@@ -199,21 +199,46 @@ class Ui(QtWidgets.QMainWindow):
             return
 
         try:
-            bond = Bond(bond_code,
-                        buy_date,
-                        sell_date,
-                        float(buy_clean_price),
-                        float(sell_clean_price))
-            if bond_code[-2:] == 'IB' and ib_settlement != 0:
-                bond.settlement = ib_settlement
-                bond.bond_ql = bond.create_bond_ql()
+            bond = create_bond_(bond_code, buy_date, sell_date,
+                                buy_clean_price, sell_clean_price, ib_settlement)
 
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
 
         buy_yield = calculator.bond_yield(bond)
-        self.yield_at_buy.setText('{:.4f}'.format(buy_yield))
+        self.yield_at_buy.setText('{:.4f}'.format(buy_yield * 100))
         self.accrued.setText('{:.4f}'.format(bond.bond_ql.accruedAmount()))
         self.full.setText('{:.4f}'.format(
-            bond.bond_ql.accruedAmount() + buy_clean_price))
+            bond.bond_ql.accruedAmount() + float(buy_clean_price)))
+
+
+def create_bond_(bond_code,
+                 buy_date,
+                 sell_date,
+                 buy_clean_price,
+                 sell_clean_price, ib_settlement):
+
+    if re.match(r'^\d{6,8}\.(IB|SZ|SH)$', bond_code) is not None:
+        bond = Bond(bond_code,
+                    buy_date,
+                    sell_date,
+                    float(buy_clean_price),
+                    float(sell_clean_price))
+
+        if bond_code[-2:] == 'IB' and ib_settlement != 0:
+            bond.settlement = ib_settlement
+            bond.bond_ql = bond.create_bond_ql()
+
+    elif re.match(r'^\d{9}\.(IB|SZ|SH)$', bond_code) is not None:
+        bond = SCP(bond_code,
+                   buy_date,
+                   sell_date,
+                   float(buy_clean_price),
+                   float(sell_clean_price))
+
+        if bond_code[-2:] == 'IB' and ib_settlement != 0:
+            bond.settlement = ib_settlement
+            bond.bond_ql = bond.create_bond_ql()
+
+    return bond
