@@ -24,6 +24,8 @@ class Ui(QtWidgets.QMainWindow):
         self.pushButton_clear_yield.clicked.connect(self.clearYield)
         self.pushButton_yield.clicked.connect(self.getYield)
         self.ib_settlement.valueChanged.connect(self.change_settlement)
+        self.code_text.textChanged.connect(
+            lambda _: self.sell_code.setText(self.code_text.text()))
 
     def getBasicInfo(self):
         bond_code = self.code_text.text()
@@ -94,20 +96,23 @@ class Ui(QtWidgets.QMainWindow):
         buy_date = self.buy_date_text.text().replace('/', '-')
         sell_clean_price = self.sell_clean_price_text.text()
         sell_date = self.sell_date_text.text().replace('/', '-')
+        sell_code = self.sell_code.text()
         ib_settlement = int(self.ib_settlement.text())
 
         # do sanity check
         flag1 = re.match(r'^\d{6,}\.(IB|SZ|SH)$', bond_code) is not None
         flag2 = buy_clean_price.replace('.', '', 1).isdigit()
         flag3 = sell_clean_price.replace('.', '', 1).isdigit()
-        flags = (flag1, flag2, flag3)
+        flag4 = re.match(r'^\d{6,}\.(IB|SZ|SH)$', sell_code) is not None
+        flags = (flag1, flag2, flag3, flag4)
 
         if not all(flags):
             error_messages = ('债券代码格式错误\n',
                               '买入净价不为浮点数\n',
-                              '卖出净价不为浮点数')
+                              '卖出净价不为浮点数',
+                              '卖出代码格式错误')
             error_string = ''.join(
-                (error_messages[i] for i in range(3) if not flags[i]))
+                (error_messages[i] for i in range(len(error_messages)) if not flags[i]))
             QtWidgets.QMessageBox.about(self, "错误信息", error_string)
             return
 
@@ -129,25 +134,29 @@ class Ui(QtWidgets.QMainWindow):
 
     def getRepoHPY(self):
         # read all the data from input part of UI
+        # read all the data from input part of UI
         bond_code = self.code_text.text()
         buy_clean_price = self.buy_clean_price_text.text()
         buy_date = self.buy_date_text.text().replace('/', '-')
         sell_clean_price = self.sell_clean_price_text.text()
         sell_date = self.sell_date_text.text().replace('/', '-')
-        ib_settlement = int(self.ibsettlement.text())
+        sell_code = self.sell_code.text()
+        ib_settlement = int(self.ib_settlement.text())
 
         # do sanity check
         flag1 = re.match(r'^\d{6,}\.(IB|SZ|SH)$', bond_code) is not None
         flag2 = buy_clean_price.replace('.', '', 1).isdigit()
         flag3 = sell_clean_price.replace('.', '', 1).isdigit()
-        flags = (flag1, flag2, flag3)
+        flag4 = re.match(r'^\d{6,}\.(IB|SZ|SH)$', sell_code) is not None
+        flags = (flag1, flag2, flag3, flag4)
 
         if not all(flags):
             error_messages = ('债券代码格式错误\n',
                               '买入净价不为浮点数\n',
-                              '卖出净价不为浮点数')
+                              '卖出净价不为浮点数',
+                              '卖出代码格式错误')
             error_string = ''.join(
-                (error_messages[i] for i in range(3) if not flags[i]))
+                (error_messages[i] for i in range(len(error_messages)) if not flags[i]))
             QtWidgets.QMessageBox.about(self, "错误信息", error_string)
             return
 
@@ -159,9 +168,12 @@ class Ui(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
 
-        repo_hpy = calculator.repo_hpy(bond)
+        repo_hpy = calculator.repo_hpy(
+            bond, cross_exchange=(bond_code != sell_code))
+
         repo_hpy_annualized = calculator.repo_hpy(
-            bond, annualized=True)  # TODO
+            bond, annualized=True, cross_exchange=(bond_code != sell_code))  # TODO
+
         coupon_received = calculator.get_coupon_received(bond)
 
         self.hpy_text.setText('{:.4f}'.format(repo_hpy * 100))

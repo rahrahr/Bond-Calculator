@@ -20,7 +20,7 @@ def bond_yield_if_exercised(bond: BondWithOption) -> float:
                              Bond_ql.frequency())
 
 
-def hpy(bond: Bond, annualized: bool = False) -> float:
+def hpy(bond: Bond, annualized: bool = False, cross_exchange=False) -> float:
     # (sell_dirty + coupon_received) / buy_dirty - 1
     Bond_ql = bond.bond_ql
     buy_date = ql.Date(bond.buy_date, '%Y-%m-%d')
@@ -32,7 +32,9 @@ def hpy(bond: Bond, annualized: bool = False) -> float:
     ql.Settings.instance().evaluationDate = sell_date
     sell_dirty = bond.sell_clean_price + Bond_ql.accruedAmount()
 
-    coupon_between = bond.interest_cashflow
+    # coupon_between = bond.interest_cashflow
+    coupon_between = [c.amount() for c in bond.bond_ql.cashflows()
+                      if buy_date <= c.date() < sell_date]
     coupon_received = sum(coupon_between)
     if bond.taxFree == '否':
         coupon_received = coupon_received * (1 - bond.taxRate/100.0)
@@ -47,7 +49,7 @@ def hpy(bond: Bond, annualized: bool = False) -> float:
     return hpy_annualized
 
 
-def hpy_repo(bond: Bond, annualized: bool = False) -> float:
+def hpy_repo(bond: Bond, annualized: bool = False, cross_exchange=False) -> float:
     # (sell_dirty + coupon_received) / buy_dirty
 
     Bond_ql = bond.bond_ql
@@ -60,7 +62,9 @@ def hpy_repo(bond: Bond, annualized: bool = False) -> float:
     ql.Settings.instance().evaluationDate = sell_date
     sell_dirty = bond.sell_clean_price + Bond_ql.accruedAmount()
 
-    coupon_between = bond.interest_cashflow
+    # coupon_between = bond.interest_cashflow
+    coupon_between = [c.amount() for c in bond.bond_ql.cashflows()
+                      if buy_date <= c.date() < sell_date]
     coupon_received = sum(coupon_between)
 
     if bond.taxFree == '否':
@@ -77,7 +81,12 @@ def hpy_repo(bond: Bond, annualized: bool = False) -> float:
 
 
 def get_coupon_received(bond: Bond):
-    coupon_between = bond.interest_cashflow
+    # coupon_between = bond.interest_cashflow
+    Bond_ql = bond.bond_ql
+    buy_date = ql.Date(bond.buy_date, '%Y-%m-%d')
+    sell_date = ql.Date(bond.sell_date, '%Y-%m-%d')
+    coupon_between = [c.amount() for c in bond.bond_ql.cashflows()
+                      if buy_date <= c.date() < sell_date]
     coupon_received = sum(coupon_between)
 
     if bond.taxFree == '否':

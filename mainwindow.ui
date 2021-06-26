@@ -1089,7 +1089,7 @@
        <property name="geometry">
         <rect>
          <x>120</x>
-         <y>260</y>
+         <y>320</y>
          <width>151</width>
          <height>41</height>
         </rect>
@@ -1113,7 +1113,7 @@
        <property name="geometry">
         <rect>
          <x>120</x>
-         <y>190</y>
+         <y>250</y>
          <width>151</width>
          <height>41</height>
         </rect>
@@ -1364,7 +1364,7 @@
          <x>50</x>
          <y>40</y>
          <width>64</width>
-         <height>271</height>
+         <height>331</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1411,6 +1411,24 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label_19">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>15</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>卖出代码</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QLabel" name="sell_clean_price">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -1447,6 +1465,27 @@
          </widget>
         </item>
        </layout>
+      </widget>
+      <widget class="QLineEdit" name="sell_code">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>190</y>
+         <width>151</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
       </widget>
      </widget>
     </item>
