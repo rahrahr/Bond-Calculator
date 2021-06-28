@@ -5,26 +5,17 @@ import numpy as np
 import datetime
 
 
-w.start()
-today = datetime.date.today().strftime('%Y-%m-%d')
-
-test = w.wsd("210005.IB", "dailycf,dailycf_int,dailycf_prin",
-             "2021-06-01", "2022-12-01", "ShowBlank=0").Data[1]
-
-print(sum(test))
-
-
 def get_basic_info(code: str) -> dict:
     # 获取左上部分信息
 
-    info = w.wsd(code, "exch_city,exchange_cn,sec_type", "ED0D", today)
-    info2 = w.wss(code, "mktpricetype", "ShowBlank=NA")
+    info = w.wss(
+        code, "exch_city,exchange_cn,sec_type,mktpricetype", "ShowBlank=NA")
     priceType = {'1': '净价', '2': '全价', '3': '利率', '4': '其他'}
     settlement = {'IB': 'T+0', 'SH': 'T+1', 'SZ': 'T+1'}
 
     basic_info = {'location': info.Data[0][0],
                   'platform': info.Data[1][0],
-                  'quote_convention': priceType[info2.Data[0][0]],
+                  'quote_convention': priceType[info.Data[3][0]],
                   'category': info.Data[2][0],
                   'settlement': settlement[code[-2:]]}
 
@@ -34,8 +25,7 @@ def get_basic_info(code: str) -> dict:
 def get_quote(code: str) -> pd.DataFrame:
     quote_df = pd.DataFrame(None, index=['code', 'clean', 'full', 'yield'],
                             columns=['IB', 'SH', 'SZ'])
-    code_ib = w.wsd(code, "relationCode", "ED0D", today,
-                    "exchangeType=NIB").Data[0][0]
+    code_ib = w.wss(code, "relationCode", "exchangeType=NIB").Data[0][0]
     if code_ib != None:
         quote_ib = w.wsq(
             code_ib, "rt_last_cp,rt_last_dp,rt_last_ytm", "ShowBlank=NA").Data
@@ -43,8 +33,7 @@ def get_quote(code: str) -> pd.DataFrame:
         quote_ib.insert(0, code_ib)
         quote_df['IB'] = pd.Series(quote_ib, index=quote_df.index)
 
-    code_sh = w.wsd(code, "relationCode", "ED0D", today,
-                    "exchangeType=SSE").Data[0][0]
+    code_sh = w.wss(code, "relationCode", "exchangeType=SSE").Data[0][0]
     if code_sh != None:
         quote_sh = w.wsq(
             code_sh, "rt_last_cp,rt_last_dp,rt_last_ytm", "ShowBlank=NA").Data
@@ -52,8 +41,7 @@ def get_quote(code: str) -> pd.DataFrame:
         quote_sh.insert(0, code_sh)
         quote_df['SH'] = pd.Series(quote_sh, index=quote_df.index)
 
-    code_sz = w.wsd(code, "relationCode", "ED0D", today,
-                    "exchangeType=SZSE").Data[0][0]
+    code_sz = w.wss(code, "relationCode", "exchangeType=SZSE").Data[0][0]
     if code_sz != None:
         quote_sz = w.wsq(code_sz, "rt_last_cp,rt_last_dp,rt_last_ytm").Data
         quote_sz = [float(i) for i in np.ravel(quote_sz)]
@@ -61,6 +49,10 @@ def get_quote(code: str) -> pd.DataFrame:
         quote_df['SZ'] = pd.Series(quote_sz, index=quote_df.index)
 
     return quote_df
+
+
+def get_interest_type(code: str) -> str:
+    return w.wss(code, "interesttype")
 
 
 def get_issue_date(code: str) -> float:
@@ -76,7 +68,10 @@ def get_maturity_date(code: str) -> str:
 
 
 def get_frequency(code: str) -> int:
-    return w.wss(code, "interestfrequency").Data[0][0]
+    if w.wss(code, "interestfrequency").Data[0][0] != None:
+        return w.wss(code, "interestfrequency").Data[0][0]
+    else:  # 零息票券
+        return 0
 
 
 def get_accrural_method(code: str) -> str:
@@ -97,7 +92,10 @@ def get_settlement(code: str) -> int:
 
 def get_tax_info(code: str) -> list:
     tax_info = w.wsd(code, "taxfree, taxrate", "ED0D", today, "").Data
-    return [tax_info[0][0], tax_info[1][0]]
+    if tax_info:
+        return [tax_info[0][0], tax_info[1][0]]
+    else:
+        return ['否', 20]
 
 
 def get_embedded_option(code: str) -> (bool, float):
@@ -120,6 +118,8 @@ def get_embedded_option(code: str) -> (bool, float):
 
 def get_embedded_option_maturity(code: str) -> str:
     return '2021-12-31'
+
+#Wind, 未考虑非交易日
 
 
 def get_interest_payment_schedule(code: str, start_date: str, end_date: str) -> list:

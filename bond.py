@@ -20,33 +20,37 @@ class Bond:
         self.buy_clean_price: float = buy_clean_price
         self.sell_date: str = sell_date  # YYYY-MM-DD
         self.sell_clean_price: float = sell_clean_price
-
+        self.accrued_interest_type: int = 0
+        
         # The following fields require WindPy to acquire.
+        self.bond_type: str = get_interest_type(code)
         self.issue_date: str = get_issue_date(code)  # YYYY-MM-DD
         self.maturity_date: str = get_maturity_date(code)  # YYYY-MM-DD
         self.coupon_rate: float = get_coupon_rate(code)
         self.tenor: ql.Period = ql.Period(get_frequency(code))  # 6M, 3M, etc
         self.accrural_method: str = get_accrural_method(code)
         self.day_counter: ql.DayCounter = convert_accrural_method(
-            self.accrural_method)
-
-        # 0 or 1 (correspond to T+0 or T+1)
+            self.accrural_method)  # 0 or 1 (correspond to T+0 or T+1)
         self.settlement: str = get_settlement(code)
-
         self.taxFree: str = get_tax_info(code)[0]
         self.taxRate: float = get_tax_info(code)[1]
 
-        self.bond_ql = self.create_bond_ql()  # 创建QuantLib Bond类
+        if self.bond_type == '固定利率':
+            self.bond_ql = self.create_fixed_rate_bond_ql()  # 创建QuantLib Bond类
+        elif self.bond_type == '浮动利率':
+            self.bond_ql = self.create_floating_rate_bond_ql()
+        else:  # 累进利率
+            self.bond_ql = self.create_floating_rate_bond_ql()
 
-    def create_bond_ql(self) -> ql.FixedRateBond:
-        issue_date = ql.Date(self.issue_date, '%Y-%m-%d')
-        maturity = ql.Date(self.maturity_date, '%Y-%m-%d')
+    def create_fixed_rate_bond_ql(self) -> ql.FixedRateBond:
+        effectiveDate = ql.Date(self.issue_date, '%Y-%m-%d')
+        terminationDate = ql.Date(self.maturity_date, '%Y-%m-%d')
         tenor = self.tenor
-        calendar = ql.NullCalendar()
-        businessConvention = ql.Unadjusted
+        calendar = ql.China(ql.China.IB)
+        businessConvention = ql.Following
         dateGeneration = ql.DateGeneration.Backward
         monthEnd = False
-        schedule = ql.Schedule(issue_date, maturity, tenor, calendar, businessConvention,
+        schedule = ql.Schedule(effectiveDate, terminationDate, tenor, calendar, businessConvention,
                                businessConvention, dateGeneration, monthEnd)
         daycount_convention = self.day_counter
 
@@ -58,6 +62,27 @@ class Bond:
 
         return Bond_ql
 
+    def get_accrued_amount(self, date: str) -> float:
+        date = ql.Date(date, '%Y-%m-%d')
+        # TODO: 不同交易所应计利息计算规则
+        if self.accrued_interest_type == 0:
+            ql.Settings.instance().evaluationDate = date
+            return self.bond_ql.accruedAmount()
+
+    def get_dirty_price(self, date: str, clean_price: float) -> float:
+        return clean_price + self.get_accrued_amount(date, self.accrued_interest_type)
+
+    def get_coupon_received(self):
+        # coupon_between = bond.interest_cashflow
+        Bond_ql = self.bond_ql
+        buy_date = ql.Date(self.buy_date, '%Y-%m-%d')
+        sell_date = ql.Date(self.sell_date, '%Y-%m-%d')
+        coupon_between = [c.amount() for c in self.bond_ql.cashflows()
+                        if buy_date < c.date() <= sell_date]
+        coupon_received = sum(coupon_between)
+        if self.taxFree == '否':
+            coupon_received = coupon_received * (1 - self.taxRate/100.0)
+        return coupon_received
 
 @dataclass
 class SCP(Bond):
@@ -97,8 +122,8 @@ class SCP(Bond):
     def create_bond_ql(self) -> ql.FixedRateBond:
         issue_date = ql.Date(self.issue_date, '%Y-%m-%d')
         maturity = ql.Date(self.maturity_date, '%Y-%m-%d')
-        calendar = ql.NullCalendar()
-        businessConvention = ql.Unadjusted
+        calendar = ql.China(ql.China.IB)
+        businessConvention = ql.Following
         dateGeneration = ql.DateGeneration.Backward
         monthEnd = False
         schedule = ql.Schedule(issue_date, maturity, ql.Period(1), calendar, businessConvention,
@@ -137,8 +162,8 @@ class BondWithOption(Bond):
         issue_date = ql.Date(self.issue_date, '%Y-%m-%d')
         option_marturity = ql.Date(self.option_marturity, '%Y-%m-%d')
         tenor = self.tenor
-        calendar = ql.NullCalendar()
-        businessConvention = ql.Unadjusted
+        calendar = ql.China(ql.China.IB)
+        businessConvention = ql.Following
         dateGeneration = ql.DateGeneration.Backward
         monthEnd = False
         schedule = ql.Schedule(issue_date, option_marturity, tenor, calendar, businessConvention,

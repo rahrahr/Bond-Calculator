@@ -15,6 +15,10 @@ def get_basic_info(code: str) -> dict:
     return basic_info
 
 
+def get_interest_type(code: str) -> str:
+    return '固定利率'
+
+
 def get_quote(code: str) -> pd.DataFrame:
     quote_df = pd.DataFrame(None, index=['code', 'clean', 'full', 'yield'],
                             columns=['IB', 'SH', 'SZ'])
@@ -42,7 +46,7 @@ def get_accrural_method(code: str) -> str:
 
 
 def convert_accrural_method(accrural_method: str) -> ql.DayCounter:
-    return ql.ActualActual(ql.ActualActual.ISMA)
+    return ql.ActualActual()
 
 
 def get_settlement(code: str) -> int:

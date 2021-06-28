@@ -20,25 +20,22 @@ def bond_yield_if_exercised(bond: BondWithOption) -> float:
                              Bond_ql.frequency())
 
 
+def get_coupon_received(bond: Bond):
+    return bond.get_coupon_received()
+
+
 def hpy(bond: Bond, annualized: bool = False, cross_exchange=False) -> float:
     # (sell_dirty + coupon_received) / buy_dirty - 1
-    Bond_ql = bond.bond_ql
-    buy_date = ql.Date(bond.buy_date, '%Y-%m-%d')
-    sell_date = ql.Date(bond.sell_date, '%Y-%m-%d')
+    buy_dirty = bond.get_dirty_price(bond.buy_date, bond.buy_clean_price)
+    sell_dirty = bond.get_dirty_price(bond.sell_date, bond.sell_clean_price)
+    coupon_received = bond.get_coupon_received()
+    
+    #转托管费用
+    fees = 0
+    if cross_exchange:
+        fees = 0.005
 
-    ql.Settings.instance().evaluationDate = buy_date
-    buy_dirty = bond.buy_clean_price + Bond_ql.accruedAmount()
-
-    ql.Settings.instance().evaluationDate = sell_date
-    sell_dirty = bond.sell_clean_price + Bond_ql.accruedAmount()
-
-    # coupon_between = bond.interest_cashflow
-    coupon_between = [c.amount() for c in bond.bond_ql.cashflows()
-                      if buy_date <= c.date() < sell_date]
-    coupon_received = sum(coupon_between)
-    if bond.taxFree == '否':
-        coupon_received = coupon_received * (1 - bond.taxRate/100.0)
-    hpy = (sell_dirty + coupon_received) / buy_dirty - 1
+    hpy = (sell_dirty + coupon_received - fees) / buy_dirty - 1
     if not annualized:
         return hpy
 
@@ -51,26 +48,16 @@ def hpy(bond: Bond, annualized: bool = False, cross_exchange=False) -> float:
 
 def hpy_repo(bond: Bond, annualized: bool = False, cross_exchange=False) -> float:
     # (sell_dirty + coupon_received) / buy_dirty
+    buy_dirty = bond.get_dirty_price(bond.buy_date, bond.buy_clean_price)
+    sell_dirty = bond.get_dirty_price(bond.sell_date, bond.sell_clean_price)
+    coupon_received = bond.get_coupon_received()
 
-    Bond_ql = bond.bond_ql
-    buy_date = ql.Date(bond.buy_date, '%Y-%m-%d')
-    sell_date = ql.Date(bond.sell_date, '%Y-%m-%d')
+    #转托管费用
+    fees = 0
+    if cross_exchange:
+        fees = 0.005
 
-    ql.Settings.instance().evaluationDate = buy_date
-    buy_dirty = bond.buy_clean_price + Bond_ql.accruedAmount()
-
-    ql.Settings.instance().evaluationDate = sell_date
-    sell_dirty = bond.sell_clean_price + Bond_ql.accruedAmount()
-
-    # coupon_between = bond.interest_cashflow
-    coupon_between = [c.amount() for c in bond.bond_ql.cashflows()
-                      if buy_date <= c.date() < sell_date]
-    coupon_received = sum(coupon_between)
-
-    if bond.taxFree == '否':
-        coupon_received = coupon_received * (1 - bond.taxRate/100.0)
-
-    repo_hpy = (sell_dirty - buy_dirty + coupon_received) / buy_dirty
+    repo_hpy = (sell_dirty - buy_dirty + coupon_received - fees) / buy_dirty
     if not annualized:
         return repo_hpy
 
@@ -78,17 +65,3 @@ def hpy_repo(bond: Bond, annualized: bool = False, cross_exchange=False) -> floa
     year_faction = f(buy_date, sell_date)
     repo_hpy_annualized = repo_hpy / year_faction
     return repo_hpy_annualized
-
-
-def get_coupon_received(bond: Bond):
-    # coupon_between = bond.interest_cashflow
-    Bond_ql = bond.bond_ql
-    buy_date = ql.Date(bond.buy_date, '%Y-%m-%d')
-    sell_date = ql.Date(bond.sell_date, '%Y-%m-%d')
-    coupon_between = [c.amount() for c in bond.bond_ql.cashflows()
-                      if buy_date <= c.date() < sell_date]
-    coupon_received = sum(coupon_between)
-
-    if bond.taxFree == '否':
-        coupon_received = coupon_received * (1 - bond.taxRate/100.0)
-    return coupon_received
