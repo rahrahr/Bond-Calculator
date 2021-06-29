@@ -111,7 +111,29 @@ def get_embedded_option(code: str) -> (bool, float):
         return (True, repurchaseprice)
     else:
         return (True, 100.0)
+        
+def get_redemption(code: str) -> (bool, float, str):
+    embeddedopt = w.wss(code, "embeddedopt").Data[0][0]
+    clause = w.wss(code, "clauseabbr").Data[0][0]
+    redemptionprice = w.wss(code, "redemptionprice").Data[0][0]
+    redemptiondate = w.wss(code, "redemptiondate").Data[0][0]
 
+    if 'C' in clause:
+        return (True, redemptionprice, redemptiondate)
+    else:
+        return (False, 100.0, '2021-12-31')
+
+
+def get_repurchase(code: str) -> (bool, float):
+    embeddedopt = w.wss(code, "embeddedopt").Data[0][0]
+    clause = w.wss(code, "clauseabbr").Data[0][0]
+    repurchaseprice = w.wss(code, "repurchaseprice").Data[0][0]
+    repurchasedate = w.wss(code, "repurchasedate").Data[0][0]
+
+    if 'P' in clause:
+        return (True, repurchaseprice, repurchasedate)
+    else:
+        return (True, 100.0, '2021-12-31')
 
 def get_embedded_option_maturity(code: str) -> str:
     return '2021-12-31'

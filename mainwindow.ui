@@ -389,7 +389,7 @@
       <widget class="QTextBrowser" name="yield_at_buy">
        <property name="geometry">
         <rect>
-         <x>190</x>
+         <x>140</x>
          <y>260</y>
          <width>141</width>
          <height>41</height>
@@ -458,14 +458,14 @@
         </font>
        </property>
        <property name="text">
-        <string>行权收益率（赎回/回购）</string>
+        <string>行权收益率（赎回）</string>
        </property>
       </widget>
       <widget class="QTextBrowser" name="yield_if_exercised">
        <property name="geometry">
         <rect>
-         <x>190</x>
-         <y>320</y>
+         <x>140</x>
+         <y>310</y>
          <width>141</width>
          <height>41</height>
         </rect>
@@ -707,7 +707,7 @@
       <widget class="QLabel" name="label_20">
        <property name="geometry">
         <rect>
-         <x>370</x>
+         <x>300</x>
          <y>260</y>
          <width>171</width>
          <height>31</height>
@@ -731,8 +731,47 @@
       <widget class="QTextBrowser" name="yield_if_extended">
        <property name="geometry">
         <rect>
-         <x>370</x>
-         <y>290</y>
+         <x>430</x>
+         <y>260</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_21">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>320</y>
+         <width>171</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>行权收益率（回售）</string>
+       </property>
+      </widget>
+      <widget class="QTextBrowser" name="yield_if_exercised_2">
+       <property name="geometry">
+        <rect>
+         <x>430</x>
+         <y>310</y>
          <width>141</width>
          <height>41</height>
         </rect>
@@ -1307,7 +1346,7 @@
          <x>290</x>
          <y>60</y>
          <width>221</width>
-         <height>151</height>
+         <height>161</height>
         </rect>
        </property>
        <property name="sizePolicy">

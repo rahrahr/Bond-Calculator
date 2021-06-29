@@ -108,7 +108,7 @@ class Ui(QtWidgets.QMainWindow):
         try:
             bond = misc.create_bond_(bond_code, buy_date, sell_date,
                                      buy_clean_price, sell_clean_price,
-                                     ib_settlement, self.platform.text(), self.category.text())
+                                     ib_settlement, self.platform.toPlainText(), self.category.toPlainText())
 
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
@@ -116,7 +116,7 @@ class Ui(QtWidgets.QMainWindow):
         #转托管。bond_code以SH结尾，且类别国债、地方政府债，则免费，其他则收0.005%
         cross_exchange = (bond_code!=sell_code)
         is_not_free = not ((bond_code[-2:] != 'SH')
-                           and self.category.text() in ('国债', '地方政府债'))
+                           and self.category.toPlainText() in ('国债', '地方政府债'))
         cross_exchange = cross_exchange and is_not_free
         ####
         hpy = calculator.hpy(bond, cross_exchange=cross_exchange)
@@ -146,8 +146,8 @@ class Ui(QtWidgets.QMainWindow):
         try:
             bond = misc.create_bond_(bond_code, buy_date, sell_date,
                                      buy_clean_price, sell_clean_price,
-                                     ib_settlement, self.platform.text(),
-                                     self.category.text())
+                                     ib_settlement, self.platform.toPlainText(),
+                                     self.category.toPlainText())
 
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
@@ -156,7 +156,7 @@ class Ui(QtWidgets.QMainWindow):
         #转托管。bond_code以SH结尾，且类别国债、地方政府债，则免费，其他则收0.005%
         cross_exchange = (bond_code != sell_code)
         is_not_free = not ((bond_code[-2:] != 'SH')
-                           and self.category.text() in ('国债', '地方政府债'))
+                           and self.category.toPlainText() in ('国债', '地方政府债'))
         cross_exchange = cross_exchange and is_not_free
         ####
         repo_hpy = calculator.repo_hpy(
@@ -201,7 +201,7 @@ class Ui(QtWidgets.QMainWindow):
         try:
             bond = misc.create_bond_(bond_code, buy_date, sell_date,
                                      buy_clean_price, sell_clean_price, ib_settlement, 
-                                     self.platform.text(), self.category.text())
+                                     self.platform.toPlainText(), self.category.toPlainText())
 
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
@@ -214,9 +214,25 @@ class Ui(QtWidgets.QMainWindow):
             bond.bond_ql.accruedAmount() + float(buy_clean_price)))
 
         if has_option:
-            buy_yield_if_exercised = calculator.bond_yield_if_exercised(bond)
-            self.yield_if_exercised.setText(
-                '{:.4f}'.format(buy_yield_if_exercised * 100))
+            redemption_opt = get_redemption(code)
+            if redemption_opt[0]:
+                bond.option_strike = redemption_opt[1]
+                bond.option_marturity = redemption_opt[2]
+                bond.bond_ql_if_exercised = bond.create_bond_ql_if_exercised()
+                buy_yield_if_exercised = calculator.bond_yield_if_exercised(
+                    bond)
+                self.yield_if_exercised.setText(
+                    '{:.4f}'.format(buy_yield_if_exercised * 100))
+            
+            repurchase_opt = get_repurchase(code)
+            if repurchase_opt[0]:
+                bond.option_strike = repurchase_opt[1]
+                bond.option_marturity = repurchase_opt[2]
+                bond.bond_ql_if_exercised = bond.create_bond_ql_if_exercised()
+                buy_yield_if_exercised = calculator.bond_yield_if_exercised(
+                    bond)
+                self.yield_if_exercised_2.setText(
+                    '{:.4f}'.format(buy_yield_if_exercised * 100))
 
         if get_extendable(bond_code):
             buy_yield_if_extended = calculator.bond_yield_if_extended(bond)

@@ -90,4 +90,4 @@ def get_embedded_option_maturity(code: str) -> str:
 
 
 def get_extendable(code: str) -> bool:
-    return False
+    return True
