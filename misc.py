@@ -54,7 +54,7 @@ def create_bond_(bond_code,
         bond.settlement = ib_settlement
         bond.accrued_interest_type = get_accrued_interest_type(
             platform, category)
-        bond.bond_ql = bond.create_bond_ql()
+        bond.bond_ql = bond.create_fixed_rate_bond_ql()
         bond.bond_ql_if_exercised = bond.create_bond_ql_if_exercised()
     return bond
 

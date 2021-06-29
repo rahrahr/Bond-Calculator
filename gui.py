@@ -214,7 +214,7 @@ class Ui(QtWidgets.QMainWindow):
             bond.bond_ql.accruedAmount() + float(buy_clean_price)))
 
         if has_option:
-            redemption_opt = get_redemption(code)
+            redemption_opt = get_redemption(bond_code)
             if redemption_opt[0]:
                 bond.option_strike = redemption_opt[1]
                 bond.option_marturity = redemption_opt[2]
@@ -224,7 +224,7 @@ class Ui(QtWidgets.QMainWindow):
                 self.yield_if_exercised.setText(
                     '{:.4f}'.format(buy_yield_if_exercised * 100))
             
-            repurchase_opt = get_repurchase(code)
+            repurchase_opt = get_repurchase(bond_code)
             if repurchase_opt[0]:
                 bond.option_strike = repurchase_opt[1]
                 bond.option_marturity = repurchase_opt[2]

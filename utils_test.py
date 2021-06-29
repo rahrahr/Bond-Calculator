@@ -89,5 +89,25 @@ def get_embedded_option_maturity(code: str) -> str:
             raise Exception('不属于回售/赎回')
 
 
+def get_redemption(code: str) -> (bool, float, str):
+    embeddedopt = data_1.loc[code, [
+        '是否含权债', '特殊条款', '赎回日', '赎回价格', '回售日', '回售价格']]
+
+    if '赎回' in embeddedopt.loc['特殊条款']:
+        return (True, embeddedopt.loc['赎回价格'], embeddedopt.loc['赎回日'])
+    else:
+        return (False, 100.0, '2021-12-31')
+
+
+def get_repurchase(code: str) -> (bool, float):
+    embeddedopt = data_1.loc[code, [
+        '是否含权债', '特殊条款', '赎回日', '赎回价格', '回售日', '回售价格']]
+
+    if '回售' in embeddedopt.loc['特殊条款']:
+        return (True, embeddedopt.loc['回售价格'], embeddedopt.loc['回售日'])
+    else:
+        return (False, 100.0, '2021-12-31')
+
+
 def get_extendable(code: str) -> bool:
     return True
