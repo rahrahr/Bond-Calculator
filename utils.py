@@ -117,8 +117,9 @@ def get_embedded_option_maturity(code: str) -> str:
     return '2021-12-31'
 
 def get_extendable(code: str) -> bool:
+    #是否可延期
     return False
-    
+
 #Wind, 未考虑非交易日
 
 

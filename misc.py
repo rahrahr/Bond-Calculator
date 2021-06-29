@@ -12,33 +12,13 @@ def create_bond_(bond_code,
                  platform,
                  category):
 
-    if re.match(r'^\d{6,8}\.(IB|SZ|SH)$', bond_code) is not None:
-        if not get_embedded_option(bond_code)[0]:
-            bond = Bond(bond_code,
-                        buy_date,
-                        sell_date,
-                        float(buy_clean_price),
-                        float(sell_clean_price))
-
-            # if bond_code[-2:] == 'IB' and ib_settlement != 0:
-            bond.settlement = ib_settlement
-            bond.accrued_interest_type = get_accrued_interest_type(
-                platform, category)
-            bond.bond_ql = bond.create_bond_ql()
-        else:
-            bond = BondWithOption(bond_code,
-                                  buy_date,
-                                  sell_date,
-                                  float(buy_clean_price),
-                                  float(sell_clean_price))
-
-            # if bond_code[-2:] == 'IB' and ib_settlement != 0:
-            bond.settlement = ib_settlement
-            bond.accrued_interest_type = get_accrued_interest_type(
-                platform, category)
-            bond.bond_ql = bond.create_bond_ql()
-            bond.bond_ql_if_exercised = bond.create_bond_ql_if_exercised()
-    elif re.match(r'^\d{9}\.(IB|SZ|SH)$', bond_code) is not None:
+    bond = Bond(bond_code,
+                buy_date,
+                sell_date,
+                float(buy_clean_price),
+                float(sell_clean_price))
+                
+    if ql.Date(bond.maturity_date, '%Y-%m-%d') - ql.Date(bond.issue_date, '%Y-%m-%d') <= 365:
         bond = SCP(bond_code,
                    buy_date,
                    sell_date,
@@ -50,6 +30,32 @@ def create_bond_(bond_code,
         bond.accrued_interest_type = get_accrued_interest_type(
             platform, category)
         bond.bond_ql = bond.create_bond_ql()
+
+    elif not get_embedded_option(bond_code)[0]:
+        bond = Bond(bond_code,
+                    buy_date,
+                    sell_date,
+                    float(buy_clean_price),
+                    float(sell_clean_price))
+
+        # if bond_code[-2:] == 'IB' and ib_settlement != 0:
+        bond.settlement = ib_settlement
+        bond.accrued_interest_type = get_accrued_interest_type(
+            platform, category)
+        bond.bond_ql = bond.create_bond_ql()
+    else:
+        bond = BondWithOption(bond_code,
+                              buy_date,
+                              sell_date,
+                              float(buy_clean_price),
+                              float(sell_clean_price))
+
+        # if bond_code[-2:] == 'IB' and ib_settlement != 0:
+        bond.settlement = ib_settlement
+        bond.accrued_interest_type = get_accrued_interest_type(
+            platform, category)
+        bond.bond_ql = bond.create_bond_ql()
+        bond.bond_ql_if_exercised = bond.create_bond_ql_if_exercised()
     return bond
 
 

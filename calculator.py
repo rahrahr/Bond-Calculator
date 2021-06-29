@@ -22,7 +22,23 @@ def bond_yield_if_exercised(bond: BondWithOption) -> float:
 
 def bond_yield_if_extended(bond: BondWithOption) -> float:
     ql.Settings.instance().evaluationDate = ql.Date(bond.buy_date, '%Y-%m-%d')
-    Bond_ql = bond.bond_ql_if_exercised
+    effectiveDate = ql.Date(bond.issue_date, '%Y-%m-%d')
+    terminationDate = ql.Date('2199-{}'.format(bond.issue_date[-5:]), '%Y-%m-%d')
+    tenor = bond.tenor
+    calendar = ql.China(ql.China.IB)
+    businessConvention = ql.Following
+    dateGeneration = ql.DateGeneration.Forward
+    monthEnd = False
+    schedule = ql.Schedule(effectiveDate, terminationDate, tenor, calendar, businessConvention,
+                           businessConvention, dateGeneration, monthEnd)
+    daycount_convention = bond.day_counter
+
+    Bond_ql = ql.FixedRateBond(bond.settlement,
+                               100,
+                               schedule,
+                               [bond.coupon_rate/100.0],
+                               daycount_convention)
+
     return Bond_ql.bondYield(bond.buy_clean_price,
                              Bond_ql.dayCounter(),
                              ql.CompoundedThenSimple,

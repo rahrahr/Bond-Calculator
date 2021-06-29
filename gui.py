@@ -152,7 +152,7 @@ class Ui(QtWidgets.QMainWindow):
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
-            
+
         #转托管。bond_code以SH结尾，且类别国债、地方政府债，则免费，其他则收0.005%
         cross_exchange = (bond_code != sell_code)
         is_not_free = not ((bond_code[-2:] != 'SH')
@@ -217,3 +217,8 @@ class Ui(QtWidgets.QMainWindow):
             buy_yield_if_exercised = calculator.bond_yield_if_exercised(bond)
             self.yield_if_exercised.setText(
                 '{:.4f}'.format(buy_yield_if_exercised * 100))
+
+        if get_extendable(bond_code):
+            buy_yield_if_extended = calculator.bond_yield_if_extended(bond)
+            self.yield_if_extended.setText(
+                '{:.4f}'.format(buy_yield_if_extended * 100))
