@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import sys
 import QuantLib as ql
+from copy import deepcopy
 if sys.platform == 'darwin':
     from utils_test import *
 else:
@@ -21,7 +22,7 @@ class Bond:
         self.sell_date: str = sell_date  # YYYY-MM-DD
         self.sell_clean_price: float = sell_clean_price
         self.accrued_interest_type: int = 0
-        
+
         # The following fields require WindPy to acquire.
         self.bond_type: str = get_interest_type(code)
         self.issue_date: str = get_issue_date(code)  # YYYY-MM-DD
@@ -48,7 +49,7 @@ class Bond:
         tenor = self.tenor
         calendar = ql.China(ql.China.IB)
         businessConvention = ql.Following
-        dateGeneration = ql.DateGeneration.Backward
+        dateGeneration = ql.DateGeneration.Forward
         monthEnd = False
         schedule = ql.Schedule(effectiveDate, terminationDate, tenor, calendar, businessConvention,
                                businessConvention, dateGeneration, monthEnd)
@@ -63,12 +64,48 @@ class Bond:
         return Bond_ql
 
     def get_accrued_amount(self, date: str) -> float:
+        '''
+        (银行间,all) = 0
+        (深交所,附息债) = 1
+        (深交所,贴现式国债) = 2
+        (中债登,all) = 3 
+        (中证登,all) = 4
+        (上交所,all) = 5
+        '''
         date = ql.Date(date, '%Y-%m-%d')
         # TODO: 不同交易所应计利息计算规则
         if self.accrued_interest_type == 0:
             ql.Settings.instance().evaluationDate = date
             return self.bond_ql.accruedAmount()
 
+        elif self.accrued_interest_type == 1:
+            ql.Settings.instance().evaluationDate = date - ql.Period('1D')
+            b = deepcopy(self.bond_ql)
+            b.dayCounter = ql.Actual365Fixed(ql.Actual365Fixed.NoLeap)
+            return b.accruedAmount()
+
+        elif self.accrued_interest_type == 2:
+            ql.Settings.instance().evaluationDate = date - ql.Period('1D')
+            return self.bond_ql.accruedAmount()
+
+        elif self.accrued_interest_type == 3:
+            ql.Settings.instance().evaluationDate = date - ql.Period('1D')
+            return self.bond_ql.accruedAmount()
+
+        elif self.accrued_interest_type == 4:
+            ql.Settings.instance().evaluationDate = date
+            b = deepcopy(self.bond_ql)
+            b.dayCounter = ql.Actual365Fixed(ql.Actual365Fixed.NoLeap)
+            return b.accruedAmount()
+
+        elif self.accrued_interest_type == 5:
+            ql.Settings.instance().evaluationDate = date - ql.Period('1D')
+            return self.bond_ql.accruedAmount()
+
+        else:
+            ql.Settings.instance().evaluationDate = date
+            return self.bond_ql.accruedAmount()
+            
     def get_dirty_price(self, date: str, clean_price: float) -> float:
         return clean_price + self.get_accrued_amount(date, self.accrued_interest_type)
 
@@ -78,11 +115,12 @@ class Bond:
         buy_date = ql.Date(self.buy_date, '%Y-%m-%d')
         sell_date = ql.Date(self.sell_date, '%Y-%m-%d')
         coupon_between = [c.amount() for c in self.bond_ql.cashflows()
-                        if buy_date < c.date() <= sell_date]
+                          if buy_date < c.date() <= sell_date]
         coupon_received = sum(coupon_between)
         if self.taxFree == '否':
             coupon_received = coupon_received * (1 - self.taxRate/100.0)
         return coupon_received
+
 
 @dataclass
 class SCP(Bond):

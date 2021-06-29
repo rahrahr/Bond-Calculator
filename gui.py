@@ -113,10 +113,15 @@ class Ui(QtWidgets.QMainWindow):
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
-
-        hpy = calculator.hpy(bond, cross_exchange=(bond_code != sell_code))
+        #转托管。bond_code以SH结尾，且类别国债、地方政府债，则免费，其他则收0.005%
+        cross_exchange = (bond_code!=sell_code)
+        is_not_free = not ((bond_code[-2:] != 'SH')
+                           and self.category.text() in ('国债', '地方政府债'))
+        cross_exchange = cross_exchange and is_not_free
+        ####
+        hpy = calculator.hpy(bond, cross_exchange=cross_exchange)
         hpy_annualized = calculator.hpy(
-            bond, annualized=True, cross_exchange=(bond_code != sell_code))
+            bond, annualized=True, cross_exchange=cross_exchange)
         coupon_received = calculator.get_coupon_received(bond)
 
         self.hpy_text.setText('{:.4f}'.format(hpy * 100))
@@ -147,12 +152,18 @@ class Ui(QtWidgets.QMainWindow):
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
-
+            
+        #转托管。bond_code以SH结尾，且类别国债、地方政府债，则免费，其他则收0.005%
+        cross_exchange = (bond_code != sell_code)
+        is_not_free = not ((bond_code[-2:] != 'SH')
+                           and self.category.text() in ('国债', '地方政府债'))
+        cross_exchange = cross_exchange and is_not_free
+        ####
         repo_hpy = calculator.repo_hpy(
-            bond, cross_exchange=(bond_code != sell_code))
+            bond, cross_exchange=cross_exchange)
 
         repo_hpy_annualized = calculator.repo_hpy(
-            bond, annualized=True, cross_exchange=(bond_code != sell_code))  # TODO
+            bond, annualized=True, cross_exchange=cross_exchange)  # TODO
 
         coupon_received = calculator.get_coupon_received(bond)
 

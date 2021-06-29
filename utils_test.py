@@ -87,3 +87,7 @@ def get_embedded_option_maturity(code: str) -> str:
             return redeem_date
         else:
             raise Exception('不属于回售/赎回')
+
+
+def get_extendable(code: str) -> bool:
+    return False

@@ -92,10 +92,7 @@ def get_settlement(code: str) -> int:
 
 def get_tax_info(code: str) -> list:
     tax_info = w.wsd(code, "taxfree, taxrate", "ED0D", today, "").Data
-    if tax_info:
-        return [tax_info[0][0], tax_info[1][0]]
-    else:
-        return ['否', 20]
+    return [tax_info[0][0], tax_info[1][0]]
 
 
 def get_embedded_option(code: str) -> (bool, float):
@@ -119,6 +116,9 @@ def get_embedded_option(code: str) -> (bool, float):
 def get_embedded_option_maturity(code: str) -> str:
     return '2021-12-31'
 
+def get_extendable(code: str) -> bool:
+    return False
+    
 #Wind, 未考虑非交易日
 
 

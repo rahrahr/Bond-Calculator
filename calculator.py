@@ -20,6 +20,15 @@ def bond_yield_if_exercised(bond: BondWithOption) -> float:
                              Bond_ql.frequency())
 
 
+def bond_yield_if_extended(bond: BondWithOption) -> float:
+    ql.Settings.instance().evaluationDate = ql.Date(bond.buy_date, '%Y-%m-%d')
+    Bond_ql = bond.bond_ql_if_exercised
+    return Bond_ql.bondYield(bond.buy_clean_price,
+                             Bond_ql.dayCounter(),
+                             ql.CompoundedThenSimple,
+                             Bond_ql.frequency())
+
+
 def get_coupon_received(bond: Bond):
     return bond.get_coupon_received()
 
@@ -29,8 +38,8 @@ def hpy(bond: Bond, annualized: bool = False, cross_exchange=False) -> float:
     buy_dirty = bond.get_dirty_price(bond.buy_date, bond.buy_clean_price)
     sell_dirty = bond.get_dirty_price(bond.sell_date, bond.sell_clean_price)
     coupon_received = bond.get_coupon_received()
-    
-    #转托管费用
+
+    # 转托管费用
     fees = 0
     if cross_exchange:
         fees = 0.005
@@ -52,7 +61,7 @@ def hpy_repo(bond: Bond, annualized: bool = False, cross_exchange=False) -> floa
     sell_dirty = bond.get_dirty_price(bond.sell_date, bond.sell_clean_price)
     coupon_received = bond.get_coupon_received()
 
-    #转托管费用
+    # 转托管费用
     fees = 0
     if cross_exchange:
         fees = 0.005
