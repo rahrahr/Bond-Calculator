@@ -23,7 +23,8 @@ def bond_yield_if_exercised(bond: BondWithOption) -> float:
 def bond_yield_if_extended(bond: BondWithOption) -> float:
     ql.Settings.instance().evaluationDate = ql.Date(bond.buy_date, '%Y-%m-%d')
     effectiveDate = ql.Date(bond.issue_date, '%Y-%m-%d')
-    terminationDate = ql.Date('2199-{}'.format(bond.issue_date[-5:]), '%Y-%m-%d')
+    terminationDate = ql.Date(
+        '2199-{}'.format(bond.issue_date[-5:]), '%Y-%m-%d')
     tenor = bond.tenor
     calendar = ql.China(ql.China.IB)
     businessConvention = ql.Following
@@ -36,7 +37,7 @@ def bond_yield_if_extended(bond: BondWithOption) -> float:
     Bond_ql = ql.FixedRateBond(bond.settlement,
                                100,
                                schedule,
-                               [bond.coupon_rate/100.0],
+                               [i / 100 for i in bond.coupon_rate],
                                daycount_convention)
 
     return Bond_ql.bondYield(bond.buy_clean_price,
@@ -66,12 +67,13 @@ def hpy(bond: Bond, annualized: bool = False, cross_exchange=False) -> float:
 
     # Annualize hpy
     f = bond.bond_ql.dayCounter().yearFraction
-    year_faction = f(buy_date, sell_date)
+    year_faction = f(ql.Date(bond.buy_date, '%Y-%m-%d'),
+                     ql.Date(bond.sell_date, '%Y-%m-%d'))
     hpy_annualized = hpy/year_faction
     return hpy_annualized
 
 
-def hpy_repo(bond: Bond, annualized: bool = False, cross_exchange=False) -> float:
+def repo_hpy(bond: Bond, annualized: bool = False, cross_exchange=False) -> float:
     # (sell_dirty + coupon_received) / buy_dirty
     buy_dirty = bond.get_dirty_price(bond.buy_date, bond.buy_clean_price)
     sell_dirty = bond.get_dirty_price(bond.sell_date, bond.sell_clean_price)
@@ -87,6 +89,7 @@ def hpy_repo(bond: Bond, annualized: bool = False, cross_exchange=False) -> floa
         return repo_hpy
 
     f = bond.bond_ql.dayCounter().yearFraction
-    year_faction = f(buy_date, sell_date)
+    year_faction = f(ql.Date(bond.buy_date, '%Y-%m-%d'),
+                     ql.Date(bond.sell_date, '%Y-%m-%d'))
     repo_hpy_annualized = repo_hpy / year_faction
     return repo_hpy_annualized

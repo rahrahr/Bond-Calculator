@@ -5,6 +5,10 @@ import numpy as np
 import datetime
 
 
+w.start()
+today = datetime.date.today().strftime('%Y-%m-%d')
+
+
 def get_basic_info(code: str) -> dict:
     # 获取左上部分信息
 
@@ -52,15 +56,21 @@ def get_quote(code: str) -> pd.DataFrame:
 
 
 def get_interest_type(code: str) -> str:
-    return w.wss(code, "interesttype")
+    return w.wss(code, "interesttype").Data[0][0]
+
+
+def get_face_value(code: str) -> float:
+    return w.wss(code, "par").Data[0][0]
 
 
 def get_issue_date(code: str) -> float:
     return w.wss(code, "carrydate").Data[0][0].strftime('%Y-%m-%d')
 
 
-def get_coupon_rate(code: str) -> float:
-    return w.wss(code, "couponrate2").Data[0][0]
+def get_coupon_rate(code: str, start_date: str, end_date: str) -> list:
+    coupon_rate = w.wsd(code, "couponrate3", start_date,
+                        end_date, "ShowBlank=0").Data[0]
+    return coupon_rate
 
 
 def get_maturity_date(code: str) -> str:
@@ -78,9 +88,12 @@ def get_accrural_method(code: str) -> str:
     return w.wss(code, "actualbenchmark").Data[0][0]
 
 
-def convert_accrural_method(accrural_method: str) -> ql.DayCounter:
-    dayCount = ql.Thirty365()
-    return ql.Thirty365()
+def convert_accrural_method(code: str) -> ql.DayCounter:
+    if get_accrural_method(code) == 'ACT/ACT':
+        return ql.ActualActual()
+    elif get_accrural_method(code) == 'A/365F':
+        return ql.Thirty365()
+    return ql.Thirty360()
 
 
 def get_settlement(code: str) -> int:
@@ -111,7 +124,8 @@ def get_embedded_option(code: str) -> (bool, float):
         return (True, repurchaseprice)
     else:
         return (True, 100.0)
-        
+
+
 def get_redemption(code: str) -> (bool, float, str):
     embeddedopt = w.wss(code, "embeddedopt").Data[0][0]
     clause = w.wss(code, "clauseabbr").Data[0][0]
@@ -135,24 +149,11 @@ def get_repurchase(code: str) -> (bool, float):
     else:
         return (True, 100.0, '2021-12-31')
 
+
 def get_embedded_option_maturity(code: str) -> str:
     return '2021-12-31'
+
 
 def get_extendable(code: str) -> bool:
     #是否可延期
     return False
-
-#Wind, 未考虑非交易日
-
-
-def get_interest_payment_schedule(code: str, start_date: str, end_date: str) -> list:
-    schedule = list(
-        set(w.wsd(code, "nxcupn", start_date, end_date, "").Data[0]))
-    schedule.sort()
-    start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-    end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
-    return [i for i in schedule if i >= start_date and i < end_date]
-
-
-def get_interest_cashflow(code: str, start_date: str, end_date: str) -> list:
-    return w.wsd(code, "dailycf_int", start_date, end_date, "ShowBlank=0").Data[0]

@@ -29,8 +29,8 @@ def get_issue_date(code: str) -> float:
     return data_1.loc[code, '起息日期'].date().strftime('%Y-%m-%d')
 
 
-def get_coupon_rate(code: str) -> float:
-    return data_1.loc[code, '票面利率(当期)\n[单位] %']
+def get_coupon_rate(code: str, x, y) -> float:
+    return [data_1.loc[code, '票面利率(当期)\n[单位] %']]
 
 
 def get_maturity_date(code: str) -> str:
@@ -38,6 +38,8 @@ def get_maturity_date(code: str) -> str:
 
 
 def get_frequency(code: str) -> int:
+    if pd.isnull(data_1.loc[code, '每年付息次数']):
+        return 0
     return int(data_1.loc[code, '每年付息次数'])
 
 
@@ -110,4 +112,8 @@ def get_repurchase(code: str) -> (bool, float):
 
 
 def get_extendable(code: str) -> bool:
-    return True
+    return False
+
+
+def get_face_value(code: str) -> float:
+    return 100
