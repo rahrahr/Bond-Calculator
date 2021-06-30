@@ -55,6 +55,8 @@ def get_settlement(code: str) -> int:
     else:
         return 0
 
+def is_amortized(code: str) -> bool:
+    return False
 
 def get_tax_info(code: str) -> tuple:
     tax_info = data_1.loc[code, ['是否免税', '税率\n[单位] %']]

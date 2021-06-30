@@ -23,7 +23,10 @@ class Bond:
 
         # The following fields require WindPy to acquire.
         self.bond_type: str = get_interest_type(code)
-        self.face_value: float = get_face_value(code)
+        try:
+            self.face_value: float = get_face_value(code)
+        except:
+            self.face_value: float = 100.0
         self.issue_date: str = get_issue_date(code)  # YYYY-MM-DD
         self.maturity_date: str = get_maturity_date(code)  # YYYY-MM-DD
         self.tenor: ql.Period = ql.Period(get_frequency(code))  # 6M, 3M, etc
@@ -33,9 +36,12 @@ class Bond:
         self.settlement: str = get_settlement(code)
         self.taxFree: str = get_tax_info(code)[0]
         self.taxRate: float = get_tax_info(code)[1]
-        self.coupon_rate: list = get_coupon_rate(
-            code, self.issue_date, self.maturity_date)
-
+        try:
+            self.coupon_rate: list = get_coupon_rate(
+                code, self.issue_date, self.maturity_date)
+        except:
+            self.coupon_rate: list = [0.0]
+        self.isAmortized: bool = is_amortized(code)
         self.bond_ql = self.create_bond_ql()
 
     def create_bond_ql(self) -> ql.FixedRateBond:
@@ -50,11 +56,19 @@ class Bond:
                                businessConvention, dateGeneration, monthEnd)
         daycount_convention = self.day_counter
 
-        Bond_ql = ql.FixedRateBond(self.settlement,
-                                   self.face_value,
-                                   schedule,
-                                   [i/100.0 for i in self.coupon_rate],
-                                   daycount_convention)
+        if self.isAmortized == True:
+            Bond_ql = ql.AmortizingFixedRateBond(self.settlement,
+                                                 get_notionals(
+                                                     self.code, self.face_value),
+                                                 schedule,
+                                                 [i/100.0 for i in self.coupon_rate],
+                                                 daycount_convention)
+        else:
+            Bond_ql = ql.FixedRateBond(self.settlement,
+                                       self.face_value,
+                                       schedule,
+                                       [i/100.0 for i in self.coupon_rate],
+                                       daycount_convention)
         return Bond_ql
 
     def get_accrued_amount(self, date: str) -> float:
@@ -220,9 +234,18 @@ class BondWithOption(Bond):
         daycount_convention = self.day_counter
         face_value = self.option_strike
 
-        Bond_ql = ql.FixedRateBond(self.settlement,
-                                   self.face_value,
-                                   schedule,
-                                   [i / face_value for i in self.coupon_rate],
-                                   daycount_convention)
+
+        if self.isAmortized == True:
+            Bond_ql = ql.AmortizingFixedRateBond(self.settlement,
+                                                 get_notionals(
+                                                     self.code, self.face_value),
+                                                 schedule,
+                                                 [i / face_value for i in self.coupon_rate],
+                                                 daycount_convention)
+        else:
+            Bond_ql = ql.FixedRateBond(self.settlement,
+                                        self.face_value,
+                                        schedule,
+                                        [i / face_value for i in self.coupon_rate],
+                                        daycount_convention)
         return Bond_ql

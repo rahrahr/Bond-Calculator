@@ -4,7 +4,6 @@ from WindPy import *
 import numpy as np
 import datetime
 
-
 w.start()
 today = datetime.date.today().strftime('%Y-%m-%d')
 
@@ -13,7 +12,7 @@ def get_basic_info(code: str) -> dict:
     # 获取左上部分信息
 
     info = w.wss(
-        code, "exch_city,exchange_cn,sec_type,mktpricetype", "ShowBlank=NA")
+        code, "exch_city,exchange_cn,windl2type,mktpricetype", "ShowBlank=NA")
     priceType = {'1': '净价', '2': '全价', '3': '利率', '4': '其他'}
     settlement = {'IB': 'T+0', 'SH': 'T+1', 'SZ': 'T+1'}
 
@@ -60,7 +59,10 @@ def get_interest_type(code: str) -> str:
 
 
 def get_face_value(code: str) -> float:
-    return w.wss(code, "par").Data[0][0]
+    if w.wss(code, "par").Data[0][0] != None:
+        return w.wss(code, "par").Data[0][0]
+    else:
+        return 100.0
 
 
 def get_issue_date(code: str) -> float:
@@ -70,7 +72,10 @@ def get_issue_date(code: str) -> float:
 def get_coupon_rate(code: str, start_date: str, end_date: str) -> list:
     coupon_rate = w.wsd(code, "couponrate3", start_date,
                         end_date, "ShowBlank=0").Data[0]
-    return coupon_rate
+    if coupon_rate != None:
+        return coupon_rate
+    else:
+        return [0.0]
 
 
 def get_maturity_date(code: str) -> str:
@@ -90,9 +95,9 @@ def get_accrural_method(code: str) -> str:
 
 def convert_accrural_method(code: str) -> ql.DayCounter:
     if get_accrural_method(code) == 'ACT/ACT':
-        return ql.ActualActual(ql.ActualActual.ISMA)
+        return ql.ActualActual()
     elif get_accrural_method(code) == 'A/365F':
-        return ql.Actual365Fixed()
+        return ql.Thirty365()
     return ql.Thirty360()
 
 
@@ -157,3 +162,50 @@ def get_embedded_option_maturity(code: str) -> str:
 def get_extendable(code: str) -> bool:
     #是否可延期
     return False
+
+
+def is_amortized(code: str) -> bool:
+    return w.wss(code, "prepayportion", "serial=1").Data[0][0] == None
+
+
+def get_notionals(code: str, face_value: float) -> list:
+    prepayment = []
+    calendar = ql.China(ql.China.IB)
+
+    for i in range(1, 10):
+        prepayment_data = w.wss(
+            code, "prepaymentdate,prepayportion", "serial="+str(i)).Data
+        if prepayment_data[0][0] > datetime.datetime(2000, 1, 1, 0, 0):
+            date = ql.Date(prepayment_data[0][0].strftime(
+                '%Y-%m-%d'), '%Y-%m-%d')
+            date = calendar.adjust(date, ql.Following)
+            payment = face_value * prepayment_data[1][0] / 100.0
+            prepayment.append((date, payment))
+
+    effectiveDate = ql.Date(get_issue_date(code), '%Y-%m-%d')
+    terminationDate = ql.Date(get_maturity_date(code), '%Y-%m-%d')
+    tenor = ql.Period(get_frequency(code))
+    businessConvention = ql.Following
+    dateGeneration = ql.DateGeneration.Forward
+    monthEnd = False
+    schedule = ql.Schedule(effectiveDate, terminationDate, tenor, calendar, businessConvention,
+                           businessConvention, dateGeneration, monthEnd)
+
+    notionals_map = {k: face_value for k in list(schedule)}
+    remain_notionals = face_value
+    for i in prepayment:
+        date = i[0]
+        prepayment_amount = i[1]
+        for key in notionals_map.keys():
+            if key >= date:
+                notionals_map[key] = remain_notionals - prepayment_amount
+        remain_notionals = remain_notionals - prepayment_amount
+
+    list(notionals_map.values()).pop(0)
+    return list(notionals_map.values())
+
+#notionals = get_notionals("101655025.IB", 100.0)#list(notionals_map.values())#[100,100,100,50]
+#bond = ql.AmortizingFixedRateBond(0, notionals[0], notionals[1], [0.0358], ql.Thirty360())
+#bond.cashflows()
+#print([c.amount() for c in bond.cashflows()])
+#print([c.date() for c in bond.cashflows()])
