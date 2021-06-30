@@ -3,8 +3,6 @@ import pandas as pd
 import datetime
 
 data_1 = pd.read_excel('data0625.xlsx', index_col=0)
-data_accrued = pd.read_excel('data0625.xlsx', index_col=0)
-
 
 def get_basic_info(code: str) -> dict:
     basic_info = {'location': '0',
@@ -48,7 +46,7 @@ def get_accrural_method(code: str) -> str:
 
 
 def convert_accrural_method(accrural_method: str) -> ql.DayCounter:
-    return ql.ActualActual()
+    return ql.ActualActual(ql.ActualActual.ISMA)
 
 
 def get_settlement(code: str) -> int:

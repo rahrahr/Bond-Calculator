@@ -90,9 +90,9 @@ def get_accrural_method(code: str) -> str:
 
 def convert_accrural_method(code: str) -> ql.DayCounter:
     if get_accrural_method(code) == 'ACT/ACT':
-        return ql.ActualActual()
+        return ql.ActualActual(ql.ActualActual.ISMA)
     elif get_accrural_method(code) == 'A/365F':
-        return ql.Thirty365()
+        return ql.Actual365Fixed()
     return ql.Thirty360()
 
 

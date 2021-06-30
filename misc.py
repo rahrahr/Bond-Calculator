@@ -80,25 +80,26 @@ def sanity_check_all(mainwindow, bond_code, sell_code, buy_clean_price, sell_cle
 
 def get_accrued_interest_type(platform: str, category: str) -> int:
     '''
-    (银行间,all) = 0
-    (深交所,附息债) = 1
-    (深交所,贴现式国债) = 2
-    (中债登,all) = 3 
-    (中证登,all) = 4
-    (上交所,all) = 5
+        (银行间,all) = 0
+        (深交所,贴现债) = 1
+        (深交所,other) = 2
+        (上交所,贴现债) = 3
+        (上交所,私募债) = 4
+        (上交所,其他) = 5
     '''
     if platform == '全国银行间同业拆借中心':
         return 0
     elif platform == '深交所':
-        if category == '贴现式国债':
-            return 2
-        else:
+        if '贴现' in category:
             return 1
-    elif platform == '中债登':
-        return 3
-    elif platform == '中证登':
-        return 4
+        else:
+            return 2
     elif platform == '上交所':
-        return 5
+        if '贴现' in category:
+            return 3
+        elif '私募' in category:
+            return 4
+        else:
+            return 5
     else:
         return 0

@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 import sys
 import QuantLib as ql
-from copy import deepcopy
+from copy import copy
 if sys.platform == 'darwin':
     from utils_test import *
 else:
     from utils import *
-
 
 @dataclass
 class Bond:
@@ -61,27 +60,38 @@ class Bond:
     def get_accrued_amount(self, date: str) -> float:
         '''
         (银行间,all) = 0
-        (深交所,附息债) = 1
-        (深交所,贴现式国债) = 2
-        (中债登,all) = 3
-        (中证登,all) = 4
-        (上交所,all) = 5
+        (深交所,贴现债) = 1
+        (深交所,other) = 2
+        (上交所,贴现债) = 3
+        (上交所,私募债) = 4
+        (上交所,其他) = 5
         '''
         date = ql.Date(date, '%Y-%m-%d')
-        # TODO: 不同交易所应计利息计算规则
+        if self.settlement == 0:
+            ql.Settings.instance().evaluationDate = date
+            b = copy(self)
+            b.dayCounter = ql.ActualActual(ql.ActualActual.ISMA)
+            b.bond_ql = b.create_bond_ql()
+            return b.bond_ql.accruedAmount()
+
         if self.accrued_interest_type == 0:
             ql.Settings.instance().evaluationDate = date
-            return self.bond_ql.accruedAmount()
+            b = copy(self)
+            b.dayCounter = ql.ActualActual(ql.ActualActual.ISMA)
+            b.bond_ql = b.create_bond_ql()
+            return b.bond_ql.accruedAmount()
 
         elif self.accrued_interest_type == 1:
             ql.Settings.instance().evaluationDate = date - ql.Period('1D')
-            b = deepcopy(self.bond_ql)
-            b.dayCounter = ql.Actual365Fixed(ql.Actual365Fixed.NoLeap)
-            return b.accruedAmount()
+            return self.bond_ql.accruedAmount()
 
         elif self.accrued_interest_type == 2:
             ql.Settings.instance().evaluationDate = date - ql.Period('1D')
-            return self.bond_ql.accruedAmount()
+            b = copy(self)
+            # b.dayCounter = ql.Actual365Fixed(ql.Actual365Fixed.NoLeap)
+            b.dayCounter = ql.ActualActual(ql.ActualActual.ISMA)
+            b.bond_ql = b.create_bond_ql()
+            return b.accruedAmount()
 
         elif self.accrued_interest_type == 3:
             ql.Settings.instance().evaluationDate = date - ql.Period('1D')
@@ -89,13 +99,19 @@ class Bond:
 
         elif self.accrued_interest_type == 4:
             ql.Settings.instance().evaluationDate = date
-            b = deepcopy(self.bond_ql)
-            b.dayCounter = ql.Actual365Fixed(ql.Actual365Fixed.NoLeap)
+            b = copy(self)
+            # b.dayCounter = ql.Actual365Fixed(ql.Actual365Fixed.NoLeap)
+            b.dayCounter = ql.ActualActual(ql.ActualActual.ISMA)
+            b.bond_ql = b.create_bond_ql()
             return b.accruedAmount()
 
         elif self.accrued_interest_type == 5:
             ql.Settings.instance().evaluationDate = date - ql.Period('1D')
-            return self.bond_ql.accruedAmount()
+            b = copy(self)
+            # b.dayCounter = ql.Actual365Fixed(ql.Actual365Fixed.NoLeap)
+            b.dayCounter = ql.ActualActual(ql.ActualActual.ISMA)
+            b.bond_ql = b.create_bond_ql()
+            return b.accruedAmount()
 
         else:
             ql.Settings.instance().evaluationDate = date
