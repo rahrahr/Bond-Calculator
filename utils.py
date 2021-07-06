@@ -173,7 +173,7 @@ def is_amortized(code: str) -> bool:
 
 
 def is_discounted(code: str) -> bool:
-    return '贴现' in w.wss(code, "coupon")
+    return '贴现' in w.wss(code, "coupon").Data[0][0]
 
 
 def get_notionals(code: str, face_value: float) -> list:
@@ -213,7 +213,7 @@ def get_notionals(code: str, face_value: float) -> list:
 
 
 def get_issue_price(code: str) -> float:
-    return w.wss(code, "coupon,issue_issueprice")
+    return w.wss(code, "coupon,issue_issueprice").Data[0][0]
 
 # notionals = get_notionals("101655025.IB", 100.0)#list(notionals_map.values())#[100,100,100,50]
 #bond = ql.AmortizingFixedRateBond(0, notionals[0], notionals[1], [0.0358], ql.Thirty360())

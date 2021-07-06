@@ -3,6 +3,14 @@ from bond import *
 
 
 def bond_yield(bond: Bond) -> float:
+    if hasattr(bond, 'isDiscounted') and bond.isDiscounted:
+        ql.Settings.instance().evaluationDate = ql.Date(bond.buy_date, '%Y-%m-%d')
+        Bond_ql = bond.bond_ql
+        return Bond_ql.bondYield(bond.get_dirty_price(bond.buy_date, bond.buy_clean_price),
+                                Bond_ql.dayCounter(),
+                                ql.CompoundedThenSimple,
+                                Bond_ql.frequency())
+
     ql.Settings.instance().evaluationDate = ql.Date(bond.buy_date, '%Y-%m-%d')
     Bond_ql = bond.bond_ql
     return Bond_ql.bondYield(bond.buy_clean_price,
@@ -12,6 +20,14 @@ def bond_yield(bond: Bond) -> float:
 
 
 def bond_yield_if_exercised(bond: BondWithOption) -> float:
+    if hasattr(bond, 'isDiscounted') and bond.isDiscounted:
+        ql.Settings.instance().evaluationDate = ql.Date(bond.buy_date, '%Y-%m-%d')
+        Bond_ql = bond.bond_ql
+        return Bond_ql.bondYield(bond.get_dirty_price(bond.buy_date, bond.buy_clean_price),
+                                 Bond_ql.dayCounter(),
+                                 ql.CompoundedThenSimple,
+                                 Bond_ql.frequency())
+                                 
     ql.Settings.instance().evaluationDate = ql.Date(bond.buy_date, '%Y-%m-%d')
     Bond_ql = bond.bond_ql_if_exercised
     return Bond_ql.bondYield(bond.buy_clean_price,
