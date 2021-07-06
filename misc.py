@@ -89,12 +89,12 @@ def get_accrued_interest_type(platform: str, category: str) -> int:
     '''
     if platform == '全国银行间同业拆借中心':
         return 0
-    elif platform == '深交所':
+    elif '深' in platform:
         if '贴现' in category:
             return 1
         else:
             return 2
-    elif platform == '上交所':
+    elif '上' in platform:
         if '贴现' in category:
             return 3
         elif '私募' in category:

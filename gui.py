@@ -113,8 +113,8 @@ class Ui(QtWidgets.QMainWindow):
         except Exception:
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
-        #转托管。bond_code以SH结尾，且类别国债、地方政府债，则免费，其他则收0.005%
-        cross_exchange = (bond_code!=sell_code)
+        # 转托管。bond_code以SH结尾，且类别国债、地方政府债，则免费，其他则收0.005%
+        cross_exchange = (bond_code != sell_code)
         is_not_free = not ((bond_code[-2:] != 'SH')
                            and self.category.toPlainText() in ('国债', '地方政府债'))
         cross_exchange = cross_exchange and is_not_free
@@ -126,7 +126,7 @@ class Ui(QtWidgets.QMainWindow):
 
         self.hpy_text.setText('{:.4f}'.format(hpy * 100))
         self.hpy_annualized_text.setText('{:.4f}'.format(hpy_annualized * 100))
-        self.coupon_received.setText('{:.2f}'.format(coupon_received))
+        self.coupon_received.setText('{:.4f}'.format(coupon_received))
 
     def getRepoHPY(self):
         # read all the data from input part of UI
@@ -153,7 +153,7 @@ class Ui(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.about(self, "错误信息", traceback.format_exc())
             return
 
-        #转托管。bond_code以SH结尾，且类别国债、地方政府债，则免费，其他则收0.005%
+        # 转托管。bond_code以SH结尾，且类别国债、地方政府债，则免费，其他则收0.005%
         cross_exchange = (bond_code != sell_code)
         is_not_free = not ((bond_code[-2:] != 'SH')
                            and self.category.toPlainText() in ('国债', '地方政府债'))
@@ -200,7 +200,7 @@ class Ui(QtWidgets.QMainWindow):
 
         try:
             bond = misc.create_bond_(bond_code, buy_date, sell_date,
-                                     buy_clean_price, sell_clean_price, ib_settlement, 
+                                     buy_clean_price, sell_clean_price, ib_settlement,
                                      self.platform.toPlainText(), self.category.toPlainText())
 
         except Exception:
@@ -209,32 +209,32 @@ class Ui(QtWidgets.QMainWindow):
 
         buy_yield = calculator.bond_yield(bond)
         self.yield_at_buy.setText('{:.4f}'.format(buy_yield * 100))
-        self.accrued.setText('{:.4f}'.format(bond.bond_ql.accruedAmount()))
-        self.full.setText('{:.4f}'.format(
-            bond.bond_ql.accruedAmount() + float(buy_clean_price)))
+        self.accrued.setText('{:.4f}'.format(
+            bond.get_accrued_amount(bond.buy_date)))
+        self.full.setText('{:.4f}'.format(bond.get_dirty_price(bond.buy_date, bond.buy_clean_price)))
 
         if has_option:
-            redemption_opt = get_redemption(bond_code)
+            redemption_opt=get_redemption(bond_code)
             if redemption_opt[0]:
-                bond.option_strike = redemption_opt[1]
-                bond.option_marturity = redemption_opt[2]
-                bond.bond_ql_if_exercised = bond.create_bond_ql_if_exercised()
-                buy_yield_if_exercised = calculator.bond_yield_if_exercised(
+                bond.option_strike=redemption_opt[1]
+                bond.option_marturity=redemption_opt[2]
+                bond.bond_ql_if_exercised=bond.create_bond_ql_if_exercised()
+                buy_yield_if_exercised=calculator.bond_yield_if_exercised(
                     bond)
                 self.yield_if_exercised.setText(
                     '{:.4f}'.format(buy_yield_if_exercised * 100))
-            
-            repurchase_opt = get_repurchase(bond_code)
+
+            repurchase_opt=get_repurchase(bond_code)
             if repurchase_opt[0]:
-                bond.option_strike = repurchase_opt[1]
-                bond.option_marturity = repurchase_opt[2]
-                bond.bond_ql_if_exercised = bond.create_bond_ql_if_exercised()
-                buy_yield_if_exercised = calculator.bond_yield_if_exercised(
+                bond.option_strike=repurchase_opt[1]
+                bond.option_marturity=repurchase_opt[2]
+                bond.bond_ql_if_exercised=bond.create_bond_ql_if_exercised()
+                buy_yield_if_exercised=calculator.bond_yield_if_exercised(
                     bond)
                 self.yield_if_exercised_2.setText(
                     '{:.4f}'.format(buy_yield_if_exercised * 100))
 
         if get_extendable(bond_code):
-            buy_yield_if_extended = calculator.bond_yield_if_extended(bond)
+            buy_yield_if_extended=calculator.bond_yield_if_extended(bond)
             self.yield_if_extended.setText(
                 '{:.4f}'.format(buy_yield_if_extended * 100))

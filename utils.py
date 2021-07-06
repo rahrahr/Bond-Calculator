@@ -24,6 +24,8 @@ def get_basic_info(code: str) -> dict:
 
     return basic_info
 
+def get_full_name(code: str) -> str:
+    return ''
 
 def get_quote(code: str) -> pd.DataFrame:
     quote_df = pd.DataFrame(None, index=['code', 'clean', 'full', 'yield'],
@@ -160,13 +162,15 @@ def get_embedded_option_maturity(code: str) -> str:
 
 
 def get_extendable(code: str) -> bool:
-    #是否可延期
+    # 是否可延期
     return False
 
 
 def is_amortized(code: str) -> bool:
     return w.wss(code, "prepayportion", "serial=1").Data[0][0] == None
 
+def is_discounted(code: str) -> bool:
+    return '贴现' in get_full_name(code)
 
 def get_notionals(code: str, face_value: float) -> list:
     prepayment = []
@@ -201,11 +205,14 @@ def get_notionals(code: str, face_value: float) -> list:
                 notionals_map[key] = remain_notionals - prepayment_amount
         remain_notionals = remain_notionals - prepayment_amount
 
-    list(notionals_map.values()).pop(0)
+    notionals_map.pop(0)
     return list(notionals_map.values())
 
-#notionals = get_notionals("101655025.IB", 100.0)#list(notionals_map.values())#[100,100,100,50]
+def get_issue_price(code: str) -> float:
+    return 100
+    
+# notionals = get_notionals("101655025.IB", 100.0)#list(notionals_map.values())#[100,100,100,50]
 #bond = ql.AmortizingFixedRateBond(0, notionals[0], notionals[1], [0.0358], ql.Thirty360())
-#bond.cashflows()
+# bond.cashflows()
 #print([c.amount() for c in bond.cashflows()])
 #print([c.date() for c in bond.cashflows()])

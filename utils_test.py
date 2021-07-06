@@ -4,6 +4,7 @@ import datetime
 
 data_1 = pd.read_excel('data0625.xlsx', index_col=0)
 
+
 def get_basic_info(code: str) -> dict:
     basic_info = {'location': '0',
                   'platform': '0',
@@ -55,8 +56,10 @@ def get_settlement(code: str) -> int:
     else:
         return 0
 
+
 def is_amortized(code: str) -> bool:
     return False
+
 
 def get_tax_info(code: str) -> tuple:
     tax_info = data_1.loc[code, ['是否免税', '税率\n[单位] %']]
@@ -117,3 +120,15 @@ def get_extendable(code: str) -> bool:
 
 def get_face_value(code: str) -> float:
     return 100
+
+
+def get_issue_price(code: str) -> float:
+    return float(data_1.loc[code, '发行价'])
+
+
+def get_full_name(code: str) -> str:
+    return data_1.loc[code, '证券简称']
+
+
+def is_discounted(code: str) -> bool:
+    return '贴现' in get_full_name(code)

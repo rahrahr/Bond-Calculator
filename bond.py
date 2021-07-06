@@ -7,6 +7,7 @@ if sys.platform == 'darwin':
 else:
     from utils import *
 
+
 @dataclass
 class Bond:
     def __init__(self,
@@ -164,12 +165,19 @@ class SCP(Bond):
         # The following fields require WindPy to acquire.
         self.issue_date: str = get_issue_date(code)  # YYYY-MM-DD
         self.maturity_date: str = get_maturity_date(code)  # YYYY-MM-DD
-        self.face_value = get_face_value(code)
-        try:
-            self.coupon_rate: float = get_coupon_rate(
-                code, self.issue_date, self.maturity_date)
-        except:
-            self.coupon_rate: float = 0
+        self.face_value: float = get_face_value(code)
+        self.isAmortized: bool = False
+        self.isDiscounted: bool = is_discounted(code)
+
+        if self.isDiscounted:
+            self.issue_price = get_issue_price(code)
+            self.coupon_rate: float = [0]
+        else:
+            try:
+                self.coupon_rate: float = get_coupon_rate(
+                    code, self.issue_date, self.maturity_date)
+            except:
+                self.coupon_rate: float = [0]
 
         self.accrural_method: str = get_accrural_method(code)
         self.day_counter: ql.DayCounter = convert_accrural_method(code)
@@ -181,6 +189,21 @@ class SCP(Bond):
         self.taxRate: float = get_tax_info(code)[1]
 
         self.bond_ql = self.create_bond_ql()  # 创建QuantLib Bond类
+
+        if get_embedded_option(code)[0]:
+            self.option_strike = get_embedded_option(code)[1]
+            self.option_marturity = get_embedded_option_maturity(code)
+            self.bond_ql_if_exercised = self.create_bond_ql_if_exercised()
+
+    def get_accrued_amount(self, date:str) -> float:
+        if not self.isDiscounted:
+            return super(SCP, self).get_accrued_amount(date)
+        else:
+            x = ql.Date(date, '%Y-%m-%d') - \
+                 ql.Date(self.issue_date, '%Y-%m-%d')
+            y = ql.Date(self.maturity_date, '%Y-%m-%d') - \
+                ql.Date(self.issue_date, '%Y-%m-%d')
+            return (100 - self.issue_price) * (x / y)
 
     def create_bond_ql(self) -> ql.FixedRateBond:
         effectiveDate = ql.Date(self.issue_date, '%Y-%m-%d')
@@ -199,6 +222,36 @@ class SCP(Bond):
                                    schedule,
                                    [i/100.0 for i in self.coupon_rate],
                                    daycount_convention)
+        return Bond_ql
+
+    def create_bond_ql_if_exercised(self) -> ql.FixedRateBond:
+        issue_date = ql.Date(self.issue_date, '%Y-%m-%d')
+        option_marturity = ql.Date(self.option_marturity, '%Y-%m-%d')
+        tenor = 1
+        calendar = ql.China(ql.China.IB)
+        businessConvention = ql.Following
+        dateGeneration = ql.DateGeneration.Forward
+        monthEnd = False
+        schedule = ql.Schedule(issue_date, option_marturity, ql.Period(tenor), calendar,
+                               businessConvention, businessConvention,
+                               dateGeneration, monthEnd)
+
+        daycount_convention = self.day_counter
+        face_value = self.option_strike
+
+        if self.isAmortized == True:
+            Bond_ql = ql.AmortizingFixedRateBond(self.settlement,
+                                                 get_notionals(
+                                                     self.code, self.face_value),
+                                                 schedule,
+                                                 [i / face_value for i in self.coupon_rate],
+                                                 daycount_convention)
+        else:
+            Bond_ql = ql.FixedRateBond(self.settlement,
+                                       self.face_value,
+                                       schedule,
+                                       [i / face_value for i in self.coupon_rate],
+                                       daycount_convention)
         return Bond_ql
 
 
@@ -227,13 +280,12 @@ class BondWithOption(Bond):
         tenor = self.tenor
         calendar = ql.China(ql.China.IB)
         businessConvention = ql.Following
-        dateGeneration = ql.DateGeneration.Backward
+        dateGeneration = ql.DateGeneration.Forward
         monthEnd = False
         schedule = ql.Schedule(issue_date, option_marturity, tenor, calendar, businessConvention,
                                businessConvention, dateGeneration, monthEnd)
         daycount_convention = self.day_counter
         face_value = self.option_strike
-
 
         if self.isAmortized == True:
             Bond_ql = ql.AmortizingFixedRateBond(self.settlement,
@@ -244,8 +296,8 @@ class BondWithOption(Bond):
                                                  daycount_convention)
         else:
             Bond_ql = ql.FixedRateBond(self.settlement,
-                                        self.face_value,
-                                        schedule,
-                                        [i / face_value for i in self.coupon_rate],
-                                        daycount_convention)
+                                       self.face_value,
+                                       schedule,
+                                       [i / face_value for i in self.coupon_rate],
+                                       daycount_convention)
         return Bond_ql
